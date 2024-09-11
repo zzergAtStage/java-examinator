@@ -1,4 +1,4 @@
-# Quiz App (s09-javaexaminator)
+# Quiz App (java-examinator)
  ## Summary
 The application is designed for use both as a standalone Spring Boot MVC application and as part of a microservice module (see the relevant section).
 ## Features
