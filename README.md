@@ -66,7 +66,7 @@ JavaQuizQuestion::question_id "1" -- "*" UserAnswer::question : has
 To get started with the `s09-javaexaminator` module, follow these steps:
 
 ### Prerequisites
-- Java 11 or higher
+- Java 17 or higher
 - Maven
 - Spring Boot
 
@@ -74,17 +74,37 @@ To get started with the `s09-javaexaminator` module, follow these steps:
 
 1. **Clone the Repository:**
 ```bash
-   git clone https://github.com/zzergAtStage/s09-microservices.git
+   git clone https://github.com/zzergAtStage/java-examinator.git
 ```
 
 2. **Navigate to the Project Directory:**  
 ```bash
 cd <project-directory>
 ```
-3. ... do something with test errors
+3. Build image  
+This script will build image to run your app in container:
+```bash
+./build-scripts/build-images-native.sh
+# run container
+cd ./build-script/docker/
+docker-compose build
+docker-compose up -d
+```
+
 4. Run the application
 ```bash
-mvn -f s09-javaexaminator spring-boot:run
+mvn spring-boot:run
+```
+
+5. Use application:
+```
+http://localhost:8080
+```
+6. Import your custom exam.json  
+Run command:   
+```bash
+curl --location 'localhost:8080/api/quiz/import' \
+--form 'quiz=@"/<your custom data path>/data/exam.json"'
 ```
 
 ## Screenshoots
