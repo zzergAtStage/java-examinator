@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html class="h-100" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz Page</title>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" th:href="@{/css/quiz.css}">
+
+  <!-- Prism.js for code formatting -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.27.0/themes/prism-okaidia.min.css" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.27.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.27.0/components/prism-java.min.js"></script>
+
+  <style>
+    /* Set a max height and make the question block scrollable */
+    .scrollable-question-container {
+      max-height: 600px;
+      overflow-y: auto;
+      padding: 15px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      background-color: #f8f9fa;
+    }
+
+    .ques-box {
+      margin-bottom: 20px;
+      padding: 10px;
+      background-color: #343a40;
+      color: white;
+      border-radius: 5px;
+    }
+
+    .choice-container {
+      margin-bottom: 10px;
+    }
+
+    /* Correct answer: green border */
+    .correct-answer {
+      border: 2px solid #4caf50;
+      /* Green */
+      padding: 10px;
+      border-radius: 5px;
+    }
+
+    /* Wrong answer: red border */
+    .wrong-answer {
+      border: 2px solid #f44336;
+      /* Red */
+      padding: 10px;
+      border-radius: 5px;
+    }
+
+    .explanation {
+      margin-top: 10px;
+      color: #d9534f;
+      /* Bootstrap danger red for example */
+    }
+
+    .disabled-radio input[type="radio"] {
+      pointer-events: none;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Importing NavBar -->
+  <div th:replace="~{navbar.html :: navbar}"></div>
+
+  <div class="main-container container py-5 px-4">
+    <h1 class="bg-warning">Review Your Answers</h1>
+
+    <!-- The main form for quiz submission -->
+    <form action="/submitQuiz" method="POST" id="quizForm" th:object="${qForm}">
+      <!-- Scrollable question-answer block -->
+      <div class="scrollable-question-container" id="question-container">
+        <!-- Questions will be dynamically inserted here using JavaScript -->
+      </div>
+
+      <!-- Submit Button -->
+      <div class="mt-4">
+        <button type="button" class="btn btn-secondary" th:href="@{/submissions}" th:onclick="window.location.href='/submissions'">Dismiss</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Importing Footer -->
+  <div th:replace="~{footer.html :: footer}"></div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- JavaScript to handle dynamic question display and code snippet formatting -->
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function () {
+      // Load question data from Thymeleaf
+      const examData = JSON.parse(document.getElementById("questionData").textContent);
+
+      // Function to display all questions and highlight user's answer
+      function displayQuestions(questions) {
+        const questionContainer = document.getElementById("question-container");
+
+        questions.forEach((questionData, index) => {
+          const question = questionData.question;
+          const userAnswer = questionData.userAnswer; // User's selected answer
+          const correctAnswer = question.correctAnswer; // Correct answer for the question
+
+          // Create the HTML structure for the question block
+          let questionBlock = `
+          <div class="ques-box">
+            <p class="title">${question.questionHeader}</p>
+        `;
+
+          // Display the code block if question type is 'CODE'
+          if (question.questionType === 'CODE') {
+            questionBlock += `
+            <pre><code class="language-java">${question.questionText}</code></pre>
+          `;
+          }
+
+          // Iterate over choices and create radio buttons (disabled)
+          question.choices.forEach(choice => {
+            const isUserAnswer = choice === userAnswer;
+
+            // Determine the highlight class based on correctness
+            let highlightClass = '';
+            if (isUserAnswer) {
+              highlightClass = choice === correctAnswer ? 'correct-answer' : 'wrong-answer';
+            } else if (choice === correctAnswer) {
+              highlightClass = 'correct-answer'; // Highlight the correct answer
+            }
+            const isCorrectAnswer = choice === correctAnswer;
+            const isWrongAnswer = isUserAnswer && !isCorrectAnswer;
+            // Generate the choice block with highlight
+            questionBlock += `
+            <div class="choice-container ${highlightClass}">
+              <label>
+                <input type="radio" name="sections[${index}].userAnswers.choice" value="${choice}" disabled ${isUserAnswer ? 'checked' : ''}>
+                ${choice}
+              </label>
+            </div>
+          `;
+           // If user gave the wrong answer, add explanation
+           if (isWrongAnswer && question.correctAnswerExplanation) {
+            questionBlock += `
+            <div class="explanation">
+              <p><strong>Explanation:</strong> ${question.correctAnswerExplanation}</p>
+            </div>
+          `;
+          }
+          });
+         
+
+          // Close the question block
+          questionBlock += `
+            <input type="hidden" name="sections[${index}].userAnswers.questionId" value="${question.id}">
+          </div>
+        `;
+          
+          // Insert the question block into the container
+          questionContainer.innerHTML += questionBlock;
+        });
+
+        // Highlight code blocks using Prism.js
+        Prism.highlightAll();
+      }
+
+      // Load questions and display them
+      const questions = examData.sections.flatMap(section => section.userAnswers);
+      if (questions.length > 0) {
+        displayQuestions(questions);
+      }
+    });
+  </script>
+
+  <!-- Hidden JSON data for questions (populated by Thymeleaf) -->
+  <script type="application/json" id="questionData" th:inline="javascript">
+  /*[[${qForm}]]*/
+</script>
+
+</body>
+
+</html>

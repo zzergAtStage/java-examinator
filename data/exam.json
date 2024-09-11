@@ -1,0 +1,264 @@
+[
+  {
+    "questionType" : "CODE",
+    "questionHeader": "What will be the result of following code?",
+    "questionText" : "interface I {\n\t int i = 0;\n}",
+    "difficultyLevel": 1,
+    "correctAnswer": "Compilation fails",
+    "points": 5,
+    "choices": [
+      "0",
+      "1",
+      "Compilation fails",
+      "An exception is thrown runtime"
+    ]
+  },
+  {
+    "questionType" : "SIMPLE",
+    "questionHeader": "Which of the following is a Java keyword?",
+    "difficultyLevel": 2,
+    "correctAnswer": "class",
+    "points": 5,
+    "choices": [
+      "int",
+      "main",
+      "class",
+      "printf"
+    ]
+  },
+  {
+    "questionType" : "SIMPLE",
+    "questionHeader": "Which company originally developed Java?",
+    "difficultyLevel": 1,
+    "correctAnswer": "Sun Microsystems",
+    "points": 5,
+    "choices": [
+      "Microsoft",
+      "Apple",
+      "Sun Microsystems",
+      "Google"
+    ]
+  },
+  {
+    "questionType" : "SIMPLE",
+    "questionHeader": "What is the size of an `int` data type in Java?",
+    "difficultyLevel": 2,
+    "correctAnswer": "32 bits",
+    "points": 10,
+    "choices": [
+      "8 bits",
+      "16 bits",
+      "32 bits",
+      "64 bits"
+    ]
+  },
+  {
+    "questionType" : "SIMPLE",
+    "questionHeader": "Which method is used to start a Java program?",
+    "difficultyLevel": 1,
+    "correctAnswer": "main",
+    "points": 5,
+    "choices": [
+      "start",
+      "main",
+      "run",
+      "execute"
+    ]
+  },
+  {
+    "questionType" : "SIMPLE",
+    "questionHeader": "Which of the following is a feature of Java?",
+    "difficultyLevel": 1,
+    "correctAnswer": "Platform Independence",
+    "points": 5,
+    "choices": [
+      "Pointer Arithmetic",
+      "Platform Independence",
+      "Manual Memory Management",
+      "Complex Syntax"
+    ]
+  },
+  {
+    "questionType" : "SIMPLE",
+    "questionHeader": "What is JVM?",
+    "difficultyLevel": 2,
+    "correctAnswer": "Java Virtual Machine",
+    "points": 10,
+    "choices": [
+      "Java Variable Method",
+      "Java Virtual Machine",
+      "Java Visual Manager",
+      "Java Versatile Module"
+    ]
+  },
+  {
+    "questionType" : "SIMPLE",
+    "questionHeader": "Which of the following is a valid declaration of a string in Java?",
+    "difficultyLevel": 2,
+    "correctAnswer": "String s = \"Hello\";",
+    "points": 10,
+    "choices": [
+      "String s = 'Hello';",
+      "String s = Hello;",
+      "String s = \"Hello\";",
+      "str s = \"Hello\";"
+    ]
+  },
+  {
+    "questionType" : "SIMPLE",
+    "questionHeader": "What is the default value of a boolean in Java?",
+    "difficultyLevel": 2,
+    "correctAnswer": "false",
+    "points": 10,
+    "choices": [
+      "true",
+      "false",
+      "0",
+      "null"
+    ]
+  },
+  {
+    "questionType" : "SIMPLE",
+    "questionHeader": "Which access modifier makes a member visible only within its own class?",
+    "difficultyLevel": 3,
+    "correctAnswer": "private",
+    "points": 15,
+    "choices": [
+      "private",
+      "public",
+      "protected",
+      "default"
+    ]
+  },
+  {
+    "questionType" : "SIMPLE",
+    "questionHeader": "What is the output of: `System.out.println(2 + 3 * 4);`",
+    "difficultyLevel": 3,
+    "correctAnswer": "14",
+    "points": 15,
+    "choices": [
+      "20",
+      "14",
+      "24",
+      "10"
+    ]
+  },
+  {
+    "questionType" : "SIMPLE",
+    "questionHeader": "Which method is called to reclaim memory in Java?",
+    "difficultyLevel": 3,
+    "correctAnswer": "Garbage Collection",
+    "points": 15,
+    "choices": [
+      "Destructor",
+      "Garbage Collection",
+      "Finalizer",
+      "Deallocation"
+    ]
+  },
+  {
+    "questionType" : "SIMPLE",
+    "questionHeader": "Which of these is a checked exception in Java?",
+    "difficultyLevel": 3,
+    "correctAnswer": "IOException",
+    "points": 15,
+    "choices": [
+      "IOException",
+      "ArrayIndexOutOfBoundsException",
+      "NullPointerException",
+      "ArithmeticException"
+    ]
+  },
+  {
+    "questionType" : "SIMPLE",
+    "questionHeader": "Which interface does `TreeSet` implement?",
+    "difficultyLevel": 2,
+    "correctAnswer": "NavigableSet",
+    "points": 10,
+    "choices": [
+      "List",
+      "Set",
+      "NavigableSet",
+      "Queue"
+    ]
+  },
+  {
+    "questionType" : "SIMPLE",
+    "questionHeader": "Which of the following is a valid loop construct in Java?",
+    "difficultyLevel": 1,
+    "correctAnswer": "for",
+    "points": 5,
+    "choices": [
+      "if-else",
+      "switch-case",
+      "for",
+      "None of the above"
+    ]
+  },
+  {
+    "questionType" : "SIMPLE",
+    "questionHeader": "Which of the following is not a Java primitive data type?",
+    "difficultyLevel": 1,
+    "correctAnswer": "String",
+    "points": 5,
+    "choices": [
+      "int",
+      "float",
+      "char",
+      "String"
+    ]
+  },
+  {
+    "questionType" : "SIMPLE",
+    "questionHeader": "Which of the following is used to create an instance of a class in Java?",
+    "difficultyLevel": 1,
+    "correctAnswer": "new",
+    "points": 5,
+    "choices": [
+      "this",
+      "super",
+      "new",
+      "instance"
+    ]
+  },
+  {
+    "questionType" : "SIMPLE",
+    "questionHeader": "What is the output of the following code? `System.out.println(\"Hello\".length());`",
+    "difficultyLevel": 2,
+    "correctAnswer": "5",
+    "points": 10,
+    "choices": [
+      "4",
+      "5",
+      "6",
+      "0"
+    ]
+  },
+  {
+    "questionType" : "SIMPLE",
+    "questionHeader": "Which of the following allows multiple methods in a class with the same name but different parameters?",
+    "difficultyLevel": 2,
+    "correctAnswer": "Method Overloading",
+    "points": 10,
+    "choices": [
+      "Method Overriding",
+      "Method Overloading",
+      "Polymorphism",
+      "Inheritance"
+    ]
+  },
+  {
+    "questionType" : "CODE",
+    "questionHeader": "!!!!!!!Which of these is not a feature of object-oriented programming?",
+    "questionText" : "class Base { final public void show() { System.out.println(\"Base::show() called\"); }}",
+    "difficultyLevel": 1,
+    "correctAnswer": "Pointer Arithmetic",
+    "points": 5,
+    "choices": [
+      "Encapsulation",
+      "Inheritance",
+      "Abstraction",
+      "Pointer Arithmetic"
+    ]
+  }
+]

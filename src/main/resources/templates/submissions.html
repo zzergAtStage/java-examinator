@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" th:href="@{/css/result.css}">
+  <title>Result Page</title>
+</head>
+
+<body>
+
+  <!-- Importing NavBar -->
+  <div th:insert="~{navbar.html :: navbar}"></div>
+
+  <!-- Main Container Start -->
+  <div class="main-container container py-5 px-4">
+    <div class="card bg-dark text-light py-5 px-4 mx-auto">
+      <img th:src="@{/images/exam.svg}" alt="image">
+
+      <h3 class="bg-warning text-center mb-5 p-2">Your submissions:</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Date</th>
+            <th>Submission link</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:if="${submissions.empty}">
+            <td colspan="4">No submissions available...</td>
+          </tr>
+          <tr th:each="submission : ${submissions}">
+            <td><span th:text="${submission.id}"></span></td>
+            <td><span th:text="${#temporals.format(submission.date, 'dd-MM-yyyy HH:mm')}">date</span></td>
+            <td>
+              <a th:href="@{'/submission?id=' + ${submission.sessionIdToLink}}">
+                <span th:text="${submission.sessionIdToLink}">link</span>
+              </a>
+            </td>
+            <td>
+              <form th:action="@{delete}" method="post">
+                <input type="hidden" name="submissionId" th:value="${submission.sessionIdToLink}" />
+                <input type="submit" value="Delete" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this submission?');"/>
+            </form>
+              <!-- Form for the delete action
+              <form th:action="@{'/remove?submissionId=' + ${submission.sessionIdToLink}}" method="get">
+                <button type="submit" class="btn btn-dark text-nowrap" onclick="return confirm('Are you sure you want to delete this submission?');">Delete</button>
+              </form> -->
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="d-flex justify-content-center mt-4">
+        <button type="button" th:onclick="window.location.href='/'" class="btn btn-outline-warning mx-auto">Back to
+          Homepage</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Importing Footer -->
+  <div th:insert="~{footer.html :: footer}"></div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

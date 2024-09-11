@@ -1,0 +1,9 @@
+version: '3.9'
+
+services:
+  java-examinator:
+    container_name: java-examinator
+    #pull_policy: always
+    image: application/java-examinator:naive
+    ports:
+      - "8080:8080"

@@ -1,0 +1,48 @@
+@startuml
+title Exam JSON Structure
+
+class Exam {
+    exam_id
+    sessionId
+    examDate
+    user
+    sections
+}
+
+class User {
+    id
+    username
+}
+
+class Section {
+    section_id
+    sectionName
+    userAnswers
+}
+
+class JavaQuizQuestion {
+    question_id
+    questionType
+    questionHeader
+    questionText
+    difficultyLevel
+    correctAnswer
+    correctAnswerExplanation
+    points
+    choices
+}
+
+class UserAnswer {
+    id: Long
+    question: JavaQuizQuestion
+    userAnswer: String
+    correct
+    pointsAwarded
+}
+
+Exam "1" -- "*" User : has
+Exam "1" -- "*" Section : contains
+Section "1" -- "*" UserAnswer : has
+JavaQuizQuestion::question_id "1" -- "*" UserAnswer::question : has
+
+@enduml

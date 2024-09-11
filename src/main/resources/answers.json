@@ -1,0 +1,161 @@
+    {
+        "exam_id": 1,
+        "sessionId": "bd13bead-0a7f-41fe-bc4f-db90b749c1eb",
+        "examDate": "2024-09-10T22:14:47.977788",
+        "user": {
+            "id": 2,
+            "username": "222"
+        },
+        "sections": [
+            {
+                "section_id": 1,
+                "sectionName": "Section #1",
+                "userAnswers": [
+                    {
+                        "id": 1,
+                        "question": {
+                            "id": 14,
+                            "questionType": "SIMPLE",
+                            "questionHeader": "Which interface does `TreeSet` implement?",
+                            "questionText": null,
+                            "difficultyLevel": 2,
+                            "correctAnswer": "NavigableSet",
+                            "correctAnswerExplanation": null,
+                            "points": 10,
+                            "choices": [
+                                "List",
+                                "Set",
+                                "NavigableSet",
+                                "Queue"
+                            ]
+                        },
+                        "userAnswer": "Set",
+                        "correct": false,
+                        "pointsAwarded": 0
+                    },
+                    {
+                        "id": 2,
+                        "question": {
+                            "id": 36,
+                            "questionType": "SIMPLE",
+                            "questionHeader": "Which of the following is not a Java primitive data type?",
+                            "questionText": null,
+                            "difficultyLevel": 1,
+                            "correctAnswer": "String",
+                            "correctAnswerExplanation": null,
+                            "points": 5,
+                            "choices": [
+                                "int",
+                                "float",
+                                "char",
+                                "String"
+                            ]
+                        },
+                        "userAnswer": "float",
+                        "correct": false,
+                        "pointsAwarded": 0
+                    }
+                ]
+            },
+            {
+                "section_id": 2,
+                "sectionName": "Section #2",
+                "userAnswers": [
+                    {
+                        "id": 3,
+                        "question": {
+                            "id": 7,
+                            "questionType": "SIMPLE",
+                            "questionHeader": "What is JVM?",
+                            "questionText": null,
+                            "difficultyLevel": 2,
+                            "correctAnswer": "Java Virtual Machine",
+                            "correctAnswerExplanation": null,
+                            "points": 10,
+                            "choices": [
+                                "Java Variable Method",
+                                "Java Virtual Machine",
+                                "Java Visual Manager",
+                                "Java Versatile Module"
+                            ]
+                        },
+                        "userAnswer": "Java Virtual Machine",
+                        "correct": false,
+                        "pointsAwarded": 0
+                    },
+                    {
+                        "id": 4,
+                        "question": {
+                            "id": 22,
+                            "questionType": "SIMPLE",
+                            "questionHeader": "Which of the following is a Java keyword?",
+                            "questionText": null,
+                            "difficultyLevel": 2,
+                            "correctAnswer": "class",
+                            "correctAnswerExplanation": null,
+                            "points": 5,
+                            "choices": [
+                                "int",
+                                "main",
+                                "class",
+                                "printf"
+                            ]
+                        },
+                        "userAnswer": "main",
+                        "correct": false,
+                        "pointsAwarded": 0
+                    }
+                ]
+            },
+            {
+                "section_id": 3,
+                "sectionName": "Section #3",
+                "userAnswers": [
+                    {
+                        "id": 5,
+                        "question": {
+                            "id": 9,
+                            "questionType": "SIMPLE",
+                            "questionHeader": "What is the default value of a boolean in Java?",
+                            "questionText": null,
+                            "difficultyLevel": 2,
+                            "correctAnswer": "false",
+                            "correctAnswerExplanation": null,
+                            "points": 10,
+                            "choices": [
+                                "true",
+                                "false",
+                                "0",
+                                "null"
+                            ]
+                        },
+                        "userAnswer": "null",
+                        "correct": false,
+                        "pointsAwarded": 0
+                    },
+                    {
+                        "id": 6,
+                        "question": {
+                            "id": 6,
+                            "questionType": "SIMPLE",
+                            "questionHeader": "Which of the following is a feature of Java?",
+                            "questionText": null,
+                            "difficultyLevel": 1,
+                            "correctAnswer": "Platform Independence",
+                            "correctAnswerExplanation": null,
+                            "points": 5,
+                            "choices": [
+                                "Pointer Arithmetic",
+                                "Platform Independence",
+                                "Manual Memory Management",
+                                "Complex Syntax"
+                            ]
+                        },
+                        "userAnswer": "Platform Independence",
+                        "correct": false,
+                        "pointsAwarded": 0
+                    }
+                ]
+            }
+        ]
+    }
