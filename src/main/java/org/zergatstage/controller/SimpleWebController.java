@@ -108,7 +108,7 @@ public class SimpleWebController {
     public String getSubmission(@RequestParam("id") String submissionId, Model model){
         Exam submission = examService.getSubmittedExamBySessionId(submissionId);
         model.addAttribute("qForm", submission);
-        return "/quiz-review";
+        return "submission";
     }
 
     @GetMapping("/result")
