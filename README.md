@@ -1,4 +1,4 @@
-# Quiz App (s09-javaexaminator)
+# Quiz App (java-examinator)
  ## Summary
 The application is designed for use both as a standalone Spring Boot MVC application and as part of a microservice module (see the relevant section).
 ## Features
@@ -63,7 +63,7 @@ JavaQuizQuestion::question_id "1" -- "*" UserAnswer::question : has
 
 ## Getting Started
 
-To get started with the `s09-javaexaminator` module, follow these steps:
+To get started with the `java-examinator` module, follow these steps:
 
 ### Prerequisites
 - Java 17 or higher
@@ -85,13 +85,15 @@ cd <project-directory>
 This script will build image to run your app in container:
 ```bash
 ./build-scripts/build-images-native.sh
-# run container
+```
+4.a run container
+```bash  
 cd ./build-script/docker/
 docker-compose build
 docker-compose up -d
 ```
 
-4. Run the application
+4.b Run the application locally 
 ```bash
 mvn spring-boot:run
 ```

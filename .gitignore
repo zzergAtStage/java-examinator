@@ -36,4 +36,6 @@ build/
 /src/main/java/org/zergatstage/Main.java
 /mvnw
 /mvnw.cmd
-/data/demo.mv.db
+/data/**
+/data/demo.trace.db
+/data/exam_**

@@ -56,18 +56,18 @@ public class QuizImportService {
      */
     private void validateQuestion(JavaQuizQuestion question) {
         if (question.getQuestionHeader() == null || question.getQuestionHeader().isEmpty()) {
-            throw new IllegalArgumentException("Question text is missing");
+            throw new IllegalArgumentException("Question text is missing (" + question.getId() + ")");
         }
         if (question.getQuestionType() == QuestionType.CODE &&
                 (question.getQuestionText() == null || question.getQuestionText().isEmpty())
                 ) {
-            throw new IllegalArgumentException("Question formed incorrect");
+            throw new IllegalArgumentException("Question formed incorrect (" + question.getId() + ")");
         }
         if (question.getCorrectAnswer() == null || question.getCorrectAnswer().isEmpty()) {
-            throw new IllegalArgumentException("Correct answer is missing");
+            throw new IllegalArgumentException("Correct answer is missing (" + question.getId() + ")");
         }
         if (question.getChoices() == null || question.getChoices().isEmpty()) {
-            throw new IllegalArgumentException("Choices are missing");
+            throw new IllegalArgumentException("Choices are missing(" + question.getId() + ")");
         }
         if (question.getPoints() <= 0) {
             throw new IllegalArgumentException("Points must be greater than 0");

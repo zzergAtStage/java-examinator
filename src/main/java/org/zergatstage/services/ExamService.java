@@ -31,6 +31,8 @@ public class ExamService {
     private UserRepository userRepository;
     @Autowired
     private UserService userService;
+    @Autowired
+    private JavaQuizRepository javaQuizRepository;
 
 
     /**
@@ -153,5 +155,40 @@ public class ExamService {
 
     public void deleteSubmission(Exam exam) {
         examRepository.delete(exam);
+    }
+
+    /**
+     * Saves a Java quiz question to the repository after checking for duplicates.
+     *
+     * @param javaQuizQuestion The question to be saved.
+     * @throws IllegalArgumentException If a question with the same header and correct answer already exists.
+     */
+    public void saveQuestion(JavaQuizQuestion javaQuizQuestion) {
+        // Find questions with the same header
+        List<JavaQuizQuestion> list = javaQuizRepository.findByQuestionHeader(javaQuizQuestion.getQuestionHeader());
+
+        // Check if any question in the list has the same correct answer (ignoring case)
+        boolean duplicateExists = list.stream()
+                .anyMatch(question -> question.getCorrectAnswer()
+                        .equalsIgnoreCase(javaQuizQuestion.getCorrectAnswer()));
+
+        // If a duplicate is found, throw an exception
+        if (duplicateExists) {
+            throw new IllegalArgumentException("Question with header: \"" + javaQuizQuestion.getQuestionHeader() +
+                    "\" already exists with the same correct answer.");
+        }
+
+        // Save the new question if no duplicate exists
+        javaQuizRepository.save(javaQuizQuestion);
+    }
+
+    public JavaQuizQuestion getQuestionById(Long id) {
+        return javaQuizRepository.findById(id).orElseThrow( () ->
+                new IllegalArgumentException("No question with id " + id + " is found"));
+    }
+
+    public void updateQuestion(Long id, JavaQuizQuestion question) {
+        question.setId(id);// father 9.10.2024:02:27  like a bone in throat
+        javaQuizRepository.save(question);
     }
 }

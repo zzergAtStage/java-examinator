@@ -24,9 +24,11 @@ public class JavaQuizQuestion {
 
     private QuestionType questionType;
     private String questionHeader;
+    @Lob
     private String questionText;
     private int difficultyLevel;
     private String correctAnswer;
+    @Lob
     private String correctAnswerExplanation;
     private int points;
 
