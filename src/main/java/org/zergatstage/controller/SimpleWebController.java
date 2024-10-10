@@ -106,12 +106,13 @@ public class SimpleWebController {
   }
 
 
-  @GetMapping("/submission")
-  public String getSubmission(@RequestParam("id") String submissionId, Model model) {
-    Exam submission = examService.getSubmittedExamBySessionId(submissionId);
-    model.addAttribute("qForm", submission);
-    return "/quiz-review";
-  }
+
+    @GetMapping("/submission")
+    public String getSubmission(@RequestParam("id") String submissionId, Model model){
+        Exam submission = examService.getSubmittedExamBySessionId(submissionId);
+        model.addAttribute("qForm", submission);
+        return "/submission";
+    }
 
   @GetMapping("/result")
   public String redirectLazyToResult(Model model) {

@@ -1,4 +1,4 @@
-FROM amazoncorretto:20
+FROM  openjdk:17-jdk-slim
 
 ARG JAR_PORT
 EXPOSE ${JAR_PORT}
