@@ -100,7 +100,7 @@ public class SimpleWebController {
   public ResponseEntity<String> submit(@RequestBody Exam exam, Model m) {
     //TODO: recalculate of results
     //save the exam result
-    examService.saveSubmittedExam(exam);
+    examService.gradeExam(exam);
 
     return ResponseEntity.ok("Submitted");
   }

@@ -62,6 +62,13 @@
       <input type="number" class="form-control" id="points" name="points" min="1" required>
     </div>
     <div class="mb-3">
+      <label for="typeOfAnswer" class="form-label">Answers type</label>
+      <select class="form-select" id="typeOfAnswer" name="typeOfAnswer">
+        <option value="SINGLE">Radio</option>
+        <option value="MULTIPLE">Checkbox (multiple)</option>
+      </select>
+    </div>
+    <div class="mb-3">
       <label for="correctAnswer" class="form-label">Correct Answer</label>
       <input type="text" class="form-control" id="correctAnswer" name="correctAnswer" required>
     </div>
@@ -145,12 +152,15 @@
   }
 
   function populateForm(data) {
+    console.log("'document.getElementById('typeOfAnswer').value = " + document.getElementById('typeOfAnswer').value);
+    
       document.getElementById('questionType').value = data.questionType;
       document.getElementById('questionHeader').value = data.questionHeader;
       document.getElementById('questionText').value = data.questionText;
       document.getElementById('difficultyLevel').value = data.difficultyLevel;
       document.getElementById('points').value = data.points;
-      document.getElementById('correctAnswer').value = data.correctAnswer;
+      document.getElementById('typeOfAnswer').value = data.typeOfAnswer;
+      document.getElementById('correctAnswer').value = data.correctAnswers.join(',');
       document.getElementById('correctAnswerExplanation').value = data.correctAnswerExplanation;
       document.getElementById('choices').value = data.choices.join(',');
   }
@@ -162,7 +172,8 @@
           questionText: document.getElementById('questionText').value,
           difficultyLevel: document.getElementById('difficultyLevel').value,
           points: document.getElementById('points').value,
-          correctAnswer: document.getElementById('correctAnswer').value,
+          typeOfAnswer: document.getElementById('typeOfAnswer').value,
+          correctAnswers: document.getElementById('correctAnswer').value.split(','),
           correctAnswerExplanation: document.getElementById('correctAnswerExplanation').value,
           choices: document.getElementById('choices').value.split(',')
       };

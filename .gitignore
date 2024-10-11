@@ -39,3 +39,4 @@ build/
 /data/**
 /data/demo.trace.db
 /data/exam_**
+/src/main/resources/exam_20241011_232110.json

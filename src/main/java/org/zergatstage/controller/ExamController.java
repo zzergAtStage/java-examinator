@@ -56,7 +56,7 @@ public class ExamController {
     public ResponseEntity<ResponseDTO> addQuestion(@RequestBody JavaQuizQuestion javaQuizQuestion) {
         ResponseDTO responseDTO = new ResponseDTO();
             // Save the question to the database
-            examService.saveQuestion(javaQuizQuestion);
+            examService.saveUniqueQuestion(javaQuizQuestion);
             //TODO 8.10.2024 father: Refactor this.
             // Return a success message
             responseDTO.setBusinessMessage("Success");

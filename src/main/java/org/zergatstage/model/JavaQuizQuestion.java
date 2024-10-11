@@ -1,10 +1,7 @@
 package org.zergatstage.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
@@ -27,12 +24,17 @@ public class JavaQuizQuestion {
     @Lob
     private String questionText;
     private int difficultyLevel;
-    private String correctAnswer;
+    // father 10.10.2024:13:45 implement multiple choices answer
+    private AnswerType typeOfAnswer;
+    @ElementCollection(fetch = FetchType.EAGER)
+    @Singular
+    private List<String> correctAnswers;
     @Lob
     private String correctAnswerExplanation;
     private int points;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
+    @Singular
     private List<String> choices; // Possible choices for the question
 
 }

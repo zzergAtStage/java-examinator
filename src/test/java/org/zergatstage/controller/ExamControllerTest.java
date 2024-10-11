@@ -1,6 +1,7 @@
 package org.zergatstage.controller;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -19,9 +20,9 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-
+@Disabled
 class ExamControllerTest {
-/*    private MockMvc mockMvc;
+   private MockMvc mockMvc;
 
     @Mock
     private ExamService examService;
@@ -110,5 +111,5 @@ class ExamControllerTest {
         // Verify interaction with service layer
         verify(userService, times(1)).getUserByUsername("john_doe");
         verify(userService, times(1)).registerUser("john_doe");
-    }*/
+    }
 }

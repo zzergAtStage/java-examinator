@@ -43,6 +43,6 @@ class UserAnswer {
 Exam "1" -- "*" User : has
 Exam "1" -- "*" Section : contains
 Section "1" -- "*" UserAnswer : has
-JavaQuizQuestion::question_id "1" -- "*" UserAnswer::question : has
+JavaQuizQuestion::question_id "*" -- "1" UserAnswer::question : contains
 
 @enduml
