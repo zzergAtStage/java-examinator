@@ -23,6 +23,7 @@ public class ExamSection {
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "section_id") // Adds section_id to UserAnswer table
-    private List<UserAnswer> userAnswers;
+    @Singular
+    private List<Questions> questions;
 
 }

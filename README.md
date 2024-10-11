@@ -9,61 +9,11 @@ The application is designed for use both as a standalone Spring Boot MVC applica
 
 ## Data formats:
 The main source of questions is questions.json:
-[exam.json](./data/exam.json)
-```plantuml
-@startuml
-title Exam JSON Structure
-
-class Exam {
-    exam_id
-    sessionId
-    examDate
-    user
-    sections
-}
-
-class User {
-    id
-    username
-}
-
-class Section {
-    section_id
-    sectionName
-    userAnswers
-}
-
-class JavaQuizQuestion {
-    question_id
-    questionType
-    questionHeader
-    questionText
-    difficultyLevel
-    correctAnswer
-    correctAnswerExplanation
-    points
-    choices
-}
-
-class UserAnswer {
-    id: Long
-    question: JavaQuizQuestion
-    userAnswer: String
-    correct
-    pointsAwarded
-}
-
-Exam "1" -- "*" User : has
-Exam "1" -- "*" Section : contains
-Section "1" -- "*" UserAnswer : has
-JavaQuizQuestion::question_id "1" -- "*" UserAnswer::question : has
-
-@enduml
-```
+![Json structure](docs/images/exam-Exam_JSON_Structure.png)
 
 ## Getting Started
 
-To get started with the `s09-javaexaminator` module, follow these steps:
+To get started with the `java-examinator` module, follow these steps:
 
 ### Prerequisites
 - Java 17 or higher
@@ -85,18 +35,29 @@ cd <project-directory>
 This script will build image to run your app in container:
 ```bash
 ./build-scripts/build-images-native.sh
-# run container
+```
+4.a run container
+```bash  
 cd ./build-script/docker/
 docker-compose build
 docker-compose up -d
 ```
 
-4. Run the application
+4.b Run the application locally 
 ```bash
 mvn spring-boot:run
 ```
 
-5. Use application:
+5. Use application:  
+There are two features to drive the auto import/export:
+```properties
+#default questions
+application.questions.file=exam_.json
+application.questions.import.enabled=true #autoimport questions from file
+application.questions.export.enabled=false #autoexport questions to file exam_yyyymmddhhmmss.json
+```
+Use application:
+
 ```
 http://localhost:8080
 ```
@@ -122,4 +83,7 @@ curl --location 'localhost:8080/api/quiz/import' \
 ![Review code](./docs/images/review-wrong-code.png)
 7. Error page:
 ![Error page](./docs/images/error-page.png)
-5. 
+1. Question builder page (follow the link )  
+Lets user edit question, set multi choice answers etc.
+![Question builder](docs/images/quistion-builder.png)
+

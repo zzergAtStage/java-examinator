@@ -107,8 +107,8 @@
 
         questions.forEach((questionData, index) => {
           const question = questionData.question;
-          const userAnswer = questionData.userAnswer; // User's selected answer
-          const correctAnswer = question.correctAnswer; // Correct answer for the question
+          const userAnswers = questionData.userAnswers; // User's selected answer
+          const correctAnswers = question.correctAnswers; // Correct answer for the question
 
           // Create the HTML structure for the question block
           let questionBlock = `
@@ -125,22 +125,22 @@
 
           // Iterate over choices and create radio buttons (disabled)
           question.choices.forEach(choice => {
-            const isUserAnswer = choice === userAnswer;
+            const isUserAnswer = userAnswers.includes(choice);
 
             // Determine the highlight class based on correctness
             let highlightClass = '';
             if (isUserAnswer) {
-              highlightClass = choice === correctAnswer ? 'correct-answer' : 'wrong-answer';
-            } else if (choice === correctAnswer) {
+              highlightClass = correctAnswers.includes(choice) ? 'correct-answer' : 'wrong-answer';
+            } else if (choice === correctAnswers) {
               highlightClass = 'correct-answer'; // Highlight the correct answer
             }
-            const isCorrectAnswer = choice === correctAnswer;
+            const isCorrectAnswer = choice === correctAnswers;
             const isWrongAnswer = isUserAnswer && !isCorrectAnswer;
             // Generate the choice block with highlight
             questionBlock += `
             <div class="choice-container ${highlightClass}">
               <label>
-                <input type="radio" name="sections[${index}].userAnswers.choice" value="${choice}" disabled ${isUserAnswer ? 'checked' : ''}>
+                <input type="radio" name="sections[${index}].questions.choice" value="${choice}" disabled ${isUserAnswer ? 'checked' : ''}>
                 ${choice}
               </label>
             </div>
@@ -158,7 +158,7 @@
 
           // Close the question block
           questionBlock += `
-            <input type="hidden" name="sections[${index}].userAnswers.questionId" value="${question.id}">
+            <input type="hidden" name="sections[${index}].questions.questionId" value="${question.id}">
           </div>
         `;
           
@@ -171,7 +171,7 @@
       }
 
       // Load questions and display them
-      const questions = examData.sections.flatMap(section => section.userAnswers);
+      const questions = examData.sections.flatMap(section => section.questions);
       if (questions.length > 0) {
         displayQuestions(questions);
       }

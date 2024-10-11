@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", function () {
   examData = JSON.parse(document.getElementById("questionData").textContent);
 
   // Display the first question if there are any sections and questions
-  if (examData.sections.length > 0 && examData.sections[0].userAnswers.length > 0) {
+  if (examData.sections.length > 0 && examData.sections[0].questions.length > 0) {
     displayQuestion(currentSectionIndex, currentQuestionIndex);
   }
   // Attach the form submission handler
@@ -22,14 +22,21 @@ document.addEventListener("DOMContentLoaded", function () {
 // Function to display the current question
 function displayQuestion(sectionIndex, questionIndex) {
   const section = examData.sections[sectionIndex];
-  const question = section.userAnswers[questionIndex].question;
-  const userAnswer = section.userAnswers[questionIndex].userAnswer;
+  const question = section.questions[questionIndex].question;
+  const userAnswers = section.questions[questionIndex].userAnswers && section.questions[questionIndex].userAnswers.length != 0 ? section.questions[questionIndex].userAnswers: [];
   const questionContainer = document.getElementById("question-container");
+
+  // Determine the input type based on AnswerType
+  console.log('question.answerType: ' + question.typeOfAnswer);
+
+  const inputType = question.typeOfAnswer != 'MULTIPLE' ? 'radio' : 'checkbox';
+  const nameAttribute = question.typeOfAnswer != 'MULTIPLE' ? `question_${question.id}` : `question_${question.id}[]`;
+
 
   // Display the section title and the question
   questionContainer.innerHTML = `
     <h3>${section.sectionName}</h3> <!-- Display section name -->
-
+    <p>Question id:${question.id}</p>
     <div class="ques-box bg-dark text-light">
       <p class="title">${question.questionHeader}</p>
 
@@ -37,19 +44,19 @@ function displayQuestion(sectionIndex, questionIndex) {
       ${question.questionType === 'CODE' ? `
         <pre><code class="language-java">${question.questionText}</code></pre>
       ` : ''}
-
+      <hr>
       <div class="option">
-        ${question.choices.map((choice, i) => `
-          <div class="option-item">
-            <input type="radio" name="question_${question.id}" 
-                   value="${choice}" 
-                   id="choice_${sectionIndex}_${questionIndex}_${i}"
-                   ${userAnswer === choice ? 'checked' : ''}
-                   onchange="saveAnswer(${sectionIndex}, ${questionIndex}, '${choice}')">
-            <label for="choice_${sectionIndex}_${questionIndex}_${i}">${choice}</label>
-          </div>
-        `).join('')}
-      </div>
+          ${question.choices.map((choice, i) => `
+            <div class="option-item">
+              <input type="${inputType}" name="${nameAttribute}"
+                     value="${choice}"
+                     id="choice_${sectionIndex}_${questionIndex}_${i}"
+                     ${userAnswers.includes(choice) ? 'checked' : ''}
+                     onchange="saveAnswer(${sectionIndex}, ${questionIndex}, '${choice}')">
+              <label for="choice_${sectionIndex}_${questionIndex}_${i}">${choice}</label>
+            </div>
+          `).join('')}
+        </div>
     </div>
   `;
 
@@ -57,10 +64,14 @@ function displayQuestion(sectionIndex, questionIndex) {
   updateNavigationButtons();
 }
 
+
 // Save the selected answer to the exam data
 function saveAnswer(sectionIndex, questionIndex, selectedAnswer) {
   const section = examData.sections[sectionIndex];
-  section.userAnswers[questionIndex].userAnswer = selectedAnswer;
+  console.log("selectedAnswers: " + selectedAnswer + "\n" +
+    "userAnswers:[" + questionIndex + "] " + section.questions[questionIndex].userAnswers);
+
+  section.questions[questionIndex].userAnswers.push(selectedAnswer);
 }
 
 // Navigate to the next question
@@ -68,7 +79,7 @@ function nextQuestion() {
   const currentSection = examData.sections[currentSectionIndex];
 
   // Move to the next question in the current section, or move to the next section if needed
-  if (currentQuestionIndex < currentSection.userAnswers.length - 1) {
+  if (currentQuestionIndex < currentSection.questions.length - 1) {
     currentQuestionIndex++;
   } else if (currentSectionIndex < examData.sections.length - 1) {
     currentSectionIndex++;
@@ -84,7 +95,7 @@ function prevQuestion() {
     currentQuestionIndex--;
   } else if (currentSectionIndex > 0) {
     currentSectionIndex--;
-    currentQuestionIndex = examData.sections[currentSectionIndex].userAnswers.length - 1;
+    currentQuestionIndex = examData.sections[currentSectionIndex].questions.length - 1;
   }
 
   displayQuestion(currentSectionIndex, currentQuestionIndex);
@@ -94,8 +105,8 @@ function prevQuestion() {
 function updateNavigationButtons() {
   document.getElementById("prevButton").disabled = currentSectionIndex === 0 && currentQuestionIndex === 0;
   document.getElementById("nextButton").disabled = currentSectionIndex === examData.sections.length - 1 &&
-    currentQuestionIndex === examData.sections[examData.sections.length - 1].userAnswers.length - 1;
-  document.getElementById("submitButton").classList.toggle('d-none', !(currentSectionIndex === examData.sections.length - 1 && currentQuestionIndex === examData.sections[currentSectionIndex].userAnswers.length - 1));
+    currentQuestionIndex === examData.sections[examData.sections.length - 1].questions.length - 1;
+  document.getElementById("submitButton").classList.toggle('d-none', !(currentSectionIndex === examData.sections.length - 1 && currentQuestionIndex === examData.sections[currentSectionIndex].questions.length - 1));
 }
 
 // Prepare the form for submission by adding user answers from all sections
@@ -103,20 +114,15 @@ function prepareFormForSubmission() {
   const form = document.getElementById('quizForm');
 
   examData.sections.forEach((section, sectionIndex) => {
-    section.userAnswers.forEach((userAnswer, questionIndex) => {
+    section.questions.forEach((question, questionIndex) => {
       const input = document.createElement('input');
       input.type = 'hidden';
-      input.name = `sections[${sectionIndex}].userAnswers[${questionIndex}].userAnswer`;
-      input.value = userAnswer.userAnswer || ''; // Default to an empty string if no answer
+      input.name = `sections[${sectionIndex}].questions[${questionIndex}].userAnswer`;
+      input.value = question.userAnswer || ''; // Default to an empty string if no answer
       form.appendChild(input);
     });
   });
 }
-
-// Attach the form submission handler
-// document.getElementById('quizForm').addEventListener('submit', function(event) {
-//   prepareFormForSubmission();
-// });
 
 
 // Function to send the entire examData JSON to the server
