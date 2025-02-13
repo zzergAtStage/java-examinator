@@ -1,7 +1,8 @@
 package org.zergatstage.filemanager;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -9,81 +10,110 @@ import org.zergatstage.model.AnswerType;
 import org.zergatstage.model.JavaQuizQuestion;
 import org.zergatstage.model.QuestionType;
 import org.zergatstage.repository.JavaQuizRepository;
-import org.zergatstage.services.ExamService;
+import org.zergatstage.services.validation.QuestionValidator;
 
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
-/**
- * @author father
- */
+@Slf4j
 @Service
 public class QuizImportService {
+    private final JavaQuizRepository javaQuizRepository;
+    private final ObjectMapper objectMapper;
+    private final QuestionValidator questionValidator;
 
-    @Autowired
-    private JavaQuizRepository javaQuizRepository;
+    public QuizImportService(JavaQuizRepository javaQuizRepository, ObjectMapper objectMapper, QuestionValidator questionValidator) {
+        this.javaQuizRepository = javaQuizRepository;
+        this.objectMapper = objectMapper;
+        this.questionValidator = questionValidator;
+    }
 
-    @Autowired
-    private ObjectMapper objectMapper; // Jackson ObjectMapper for JSON parsing
-
-    @Autowired
-    private ExamService examService;
-    /**
-     * Imports quiz questions from a JSON file.
-     * @param file Multipart file uploaded containing JSON data
-     * @throws IOException if an error occurs during file parsing or saving
-     */
     @Transactional
     public void importQuizQuestions(MultipartFile file) throws IOException {
-        // Check if the file is empty
-        if (file.isEmpty()) {
-            throw new IllegalArgumentException("File is empty");
-        }
+        validateFile(file);
+        List<JavaQuizQuestion> questions = parseQuestions(file);
+        saveQuestions(questions);
+    }
 
-        // Read the content of the file into a string
+    private void validateFile(MultipartFile file) {
+        if (file == null || file.isEmpty()) {
+            throw new IllegalArgumentException("File is empty or null");
+        }
+    }
+
+    private List<JavaQuizQuestion> parseQuestions(MultipartFile file) throws IOException {
         String jsonContent = new String(file.getBytes());
+        JsonNode rootNode = objectMapper.readTree(jsonContent);
 
-        // Convert JSON content to a list of JavaQuizQuestion objects
-        JavaQuizQuestion[] questionsArray = objectMapper.readValue(jsonContent, JavaQuizQuestion[].class);
+        List<JavaQuizQuestion> questions = new ArrayList<>();
 
-      // Validate and save each question
-        for (JavaQuizQuestion question : questionsArray) {
-            validateQuestion(question);
-            javaQuizRepository.save(question);
+        if (rootNode.isArray()) {
+            for (JsonNode node : rootNode) {
+                JavaQuizQuestion question = convertJsonToQuestion(node);
+                questions.add(question);
+            }
+        } else {
+            JavaQuizQuestion question = convertJsonToQuestion(rootNode);
+            questions.add(question);
         }
+
+        log.info("Parsed {} questions from the imported file.", questions.size());
+        return questions;
     }
 
     /**
-     * Validates a single JavaQuizQuestion object.
-     * @param question JavaQuizQuestion object to validate
-     * @throws IllegalArgumentException if validation fails
+     * Converts both legacy and new JSON structures into JavaQuizQuestion objects.
      */
-    public void validateQuestion(JavaQuizQuestion question) {
-        if (question.getQuestionHeader() == null || question.getQuestionHeader().isEmpty()) {
-            throw new IllegalArgumentException("Question text is missing (" + question.getId() + ")");
-        }
-        if (question.getQuestionType() == QuestionType.CODE &&
-                (question.getQuestionText() == null || question.getQuestionText().isEmpty())
-                ) {
-            throw new IllegalArgumentException("Question formed incorrect (" + question.getId() + ")");
-        }
-        if (question.getTypeOfAnswer() == null) {
-            question.setTypeOfAnswer(AnswerType.SINGLE);
-            if (question.getCorrectAnswers().size() > 1) question.setTypeOfAnswer(AnswerType.MULTIPLE);
+    private JavaQuizQuestion convertJsonToQuestion(JsonNode node) {
+        JavaQuizQuestion.JavaQuizQuestionBuilder builder = JavaQuizQuestion.builder();
+
+        builder.questionHeader(node.get("questionHeader").asText());
+        builder.questionText(node.get("questionText").asText());
+        builder.difficultyLevel(node.get("difficultyLevel").asInt());
+        builder.correctAnswerExplanation(node.get("correctAnswerExplanation").asText());
+        builder.points(node.get("points").asInt());
+
+        // Convert question type
+        if (node.has("questionType")) {
+            builder.questionType(QuestionType.valueOf(node.get("questionType").asText()));
+        } else {
+            builder.questionType(QuestionType.SIMPLE); // Default type
         }
 
-        List<String> answers = question.getCorrectAnswers();
-        if (answers.isEmpty()) {
-            throw new IllegalArgumentException("Correct answer is missing (" + question.getId() + ")");
-        }
-        if (question.getChoices() == null || question.getChoices().isEmpty()) {
-            throw new IllegalArgumentException("Choices are missing(" + question.getId() + ")");
-        }
-        if (question.getPoints() <= 0) {
-            throw new IllegalArgumentException("Points must be greater than 0");
+        // Convert answer type (default to SINGLE if missing)
+        if (node.has("typeOfAnswer")) {
+            builder.typeOfAnswer(AnswerType.valueOf(node.get("typeOfAnswer").asText()));
+        } else {
+            builder.typeOfAnswer(AnswerType.SINGLE);
         }
 
-        examService.ensureQuestionIsUnique(question);
+        // Convert choices
+        if (node.has("choices") && node.get("choices").isArray()) {
+            List<String> choices = new ArrayList<>();
+            node.get("choices").forEach(choice -> choices.add(choice.asText()));
+            builder.choices(choices);
+        }
+
+        // Convert correct answers: Handle legacy "correctAnswer" field
+        if (node.has("correctAnswers") && node.get("correctAnswers").isArray()) {
+            List<String> correctAnswers = new ArrayList<>();
+            node.get("correctAnswers").forEach(answer -> correctAnswers.add(answer.asText()));
+            builder.correctAnswers(correctAnswers);
+        } else if (node.has("correctAnswer")) { // Legacy format
+            builder.correctAnswers(List.of(node.get("correctAnswer").asText().split(",")));
+            builder.typeOfAnswer(AnswerType.MULTIPLE);
+            log.info("Converted legacy correctAnswer '{}' to correctAnswers list.", node.get("correctAnswer").asText());
+        }
+
+        // Ignore legacy "id" field to avoid inserting existing IDs
+        return builder.build();
     }
+
+    private void saveQuestions(List<JavaQuizQuestion> questions) {
+        questions.forEach(questionValidator::validate);
+        javaQuizRepository.saveAll(questions);
+    }
+
 }

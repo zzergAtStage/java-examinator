@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:fragment="answerComposer" class="answer-composer mb-3">
+    <div class="mb-3">
+        <label class="form-label">Answer Options</label>
+        <div id="answersContainer">
+            <!-- Answer template that will be cloned -->
+            <div class="answer-template d-none">
+                <div class="input-group mb-2">
+                    <div class="input-group-text">
+                        <input type="checkbox" class="answer-correct form-check-input mt-0">
+                    </div>
+                    <input type="text" class="answer-text form-control"
+                           placeholder="Enter answer text">
+                    <button type="button" class="btn btn-danger delete-answer">Delete</button>
+                </div>
+            </div>
+
+            <!-- Initial answer option -->
+            <div class="answer-item">
+                <div class="input-group mb-2">
+                    <div class="input-group-text">
+                        <input type="checkbox" class="answer-correct form-check-input mt-0">
+                    </div>
+                    <input type="text" class="answer-text form-control"
+                           placeholder="Enter answer text">
+                    <button type="button" class="btn btn-danger delete-answer">Delete</button>
+                </div>
+            </div>
+        </div>
+
+        <button type="button" id="addAnswer"
+                class="btn btn-primary mt-2">
+            Add Answer Option
+        </button>
+    </div>
+
+    <input type="hidden" id="composerCorrectAnswer" name="correctAnswer">
+    <input type="hidden" id="composerChoices" name="choices">
+    <input type="hidden" id="answersJson" name="answersJson">
+</div>
+
+<script th:fragment="answerComposerScript">
+    // Initialize the answer composer functionality
+    (function initAnswerComposer() {
+        // Make functions globally accessible
+        window.QuizAnswerComposer = {
+            addAnswer: function() {
+                const container = document.getElementById('answersContainer');
+                const template = container.querySelector('.answer-template');
+                const newAnswer = template.cloneNode(true);
+
+                newAnswer.classList.remove('answer-template', 'd-none');
+                newAnswer.classList.add('answer-item');
+
+                // Add event listeners to the new elements
+                newAnswer.querySelector('.answer-correct').addEventListener('change', this.updateCorrectAnswers);
+                newAnswer.querySelector('.answer-text').addEventListener('input', this.updateAnswersJson);
+                newAnswer.querySelector('.delete-answer').addEventListener('click', this.deleteAnswer);
+
+                container.appendChild(newAnswer);
+                this.updateAnswersJson();
+            },
+
+            deleteAnswer: function(event) {
+                const button = event.target;
+                const answerItems = document.querySelectorAll('.answer-item');
+                if (answerItems.length > 1) {
+                    button.closest('.answer-item').remove();
+                    QuizAnswerComposer.updateAnswersJson();
+                } else {
+                    showNotification('At least one answer is required.');
+                }
+            },
+
+            updateCorrectAnswers: function(event) {
+                const checkbox = event.target;
+                const typeOfAnswer = document.getElementById('typeOfAnswer').value;
+                if (typeOfAnswer === 'SINGLE' && checkbox.checked) {
+                    document.querySelectorAll('.answer-correct').forEach(cb => {
+                        if (cb !== checkbox) cb.checked = false;
+                    });
+                }
+                QuizAnswerComposer.updateAnswersJson();
+            },
+
+            updateAnswersJson: function() {
+                const typeOfAnswer = document.getElementById('typeOfAnswer').value;
+                const answers = [];
+
+                document.querySelectorAll('.answer-item').forEach(item => {
+                    const answerText = item.querySelector('.answer-text').value;
+                    const isCorrect = item.querySelector('.answer-correct').checked;
+
+                    answers.push({
+                        text: answerText,
+                        correct: isCorrect
+                    });
+                });
+
+                const answersData = {
+                    questionType: typeOfAnswer,
+                    answers: answers
+                };
+
+                document.getElementById('answersJson').value = JSON.stringify(answersData);
+
+                const correctAnswers = answers
+                    .filter(a => a.correct)
+                    .map(a => a.text)
+                    .join(',');
+                const choices = answers
+                    .map(a => a.text)
+                    .join(',');
+
+                document.getElementById('composerCorrectAnswer').value = correctAnswers;
+                document.getElementById('composerChoices').value = choices;
+            },
+
+            initializeEventListeners: function() {
+                // Add button click handler
+                document.getElementById('addAnswer').addEventListener('click', () => this.addAnswer());
+
+                // Initial answer item event listeners
+                document.querySelectorAll('.answer-item').forEach(item => {
+                    item.querySelector('.answer-correct').addEventListener('change', this.updateCorrectAnswers);
+                    item.querySelector('.answer-text').addEventListener('input', this.updateAnswersJson);
+                    item.querySelector('.delete-answer').addEventListener('click', this.deleteAnswer);
+                });
+
+                // Type of answer change handler
+                document.getElementById('typeOfAnswer').addEventListener('change', () => this.updateAnswersJson());
+            }
+        };
+
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            QuizAnswerComposer.initializeEventListeners();
+            QuizAnswerComposer.updateAnswersJson();
+        });
+
+        // Extend the existing populateForm function
+        const originalPopulateForm = window.populateForm;
+        window.populateForm = function(data) {
+            if (originalPopulateForm) {
+                originalPopulateForm(data);
+            }
+
+            // Clear existing answers except template
+            const container = document.getElementById('answersContainer');
+            const template = container.querySelector('.answer-template');
+            container.innerHTML = '';
+            container.appendChild(template);
+
+            // Add answers from data
+            const choices = data.choices || [];
+            const correctAnswers = data.correctAnswers || [];
+
+            choices.forEach(choice => {
+                const newAnswer = template.cloneNode(true);
+                newAnswer.classList.remove('answer-template', 'd-none');
+                newAnswer.classList.add('answer-item');
+
+                const textInput = newAnswer.querySelector('.answer-text');
+                const correctCheckbox = newAnswer.querySelector('.answer-correct');
+
+                textInput.value = choice;
+                correctCheckbox.checked = correctAnswers.includes(choice);
+
+                // Add event listeners
+                newAnswer.querySelector('.answer-correct').addEventListener('change', QuizAnswerComposer.updateCorrectAnswers);
+                newAnswer.querySelector('.answer-text').addEventListener('input', QuizAnswerComposer.updateAnswersJson);
+                newAnswer.querySelector('.delete-answer').addEventListener('click', QuizAnswerComposer.deleteAnswer);
+
+                container.appendChild(newAnswer);
+            });
+
+            QuizAnswerComposer.updateAnswersJson();
+        };
+    })();
+</script>
+</html>

@@ -1,7 +1,6 @@
 package org.zergatstage.controller;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -11,18 +10,24 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.zergatstage.DTO.ExamSubmissionDTO;
 import org.zergatstage.model.Exam;
+import org.zergatstage.model.JavaQuizQuestion;
 import org.zergatstage.model.User;
 import org.zergatstage.services.ExamService;
 import org.zergatstage.services.UserService;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-@Disabled
 class ExamControllerTest {
-   private MockMvc mockMvc;
+
+    private MockMvc mockMvc;
 
     @Mock
     private ExamService examService;
@@ -33,83 +38,85 @@ class ExamControllerTest {
     @InjectMocks
     private ExamController examController;
 
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        mockMvc = MockMvcBuilders.standaloneSetup(examController).build(); // Initializes MockMvc for standalone testing of the controller
+        mockMvc = MockMvcBuilders.standaloneSetup(examController).build();
     }
 
-
-
     @Test
-    void testGetQuizSuccess() throws Exception {
-        // Mocking the service layer response
-        Exam mockExam = new Exam();
-        when(examService.getExam(1, 5)).thenReturn(mockExam);
+    void generateQuiz_ShouldReturnExam() throws Exception {
+        when(examService.getExam(anyInt(), anyInt())).thenReturn(new Exam());
 
-        // Simulating a GET request and verifying the response
-        mockMvc.perform(get("/exam/quiz")
-                        .param("difficulty", "1")
+        mockMvc.perform(get("/api/v1/exam/generate")
+                        .param("difficulty", "2")
                         .param("numberQuestions", "5"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").doesNotExist()); // Expecting that an exam is returned (without ID in this mock)
-
-        // Verify interaction with service layer
-        verify(examService, times(1)).getExam(1, 5);
+                .andExpect(status().isOk());
     }
 
     @Test
-    void testSubmitExamSuccess() throws Exception {
-        // Mocking the service response (grading logic)
-        when(examService.gradeExam(any(ExamSubmissionDTO.class))).thenReturn(85); // Assuming the total score is 85
+    void getLastAnsweredExam_ShouldReturnExam() throws Exception {
+        when(examService.getSubmittedExamBySessionId(anyString())).thenReturn(new Exam());
 
-        // Simulating the request body (JSON for exam submission)
-        String submissionJson = "{ \"userId\": 1, \"sessionId\": \"session123\", \"sectionAnswers\": { \"section1\": [] } }";
+        mockMvc.perform(get("/api/v1/exam/answered")
+                        .param("sessionId", "12345"))
+                .andExpect(status().isOk());
+    }
 
-        // Simulating a POST request and checking response
-        mockMvc.perform(post("/exam/submit")
+    @Test
+    void submitExam_ShouldReturnScore() throws Exception {
+        ExamSubmissionDTO submission = new ExamSubmissionDTO();
+        when(examService.gradeExam(new ExamSubmissionDTO())).thenReturn(85);
+
+        mockMvc.perform(post("/api/v1/exam/submit")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(submissionJson))
+                        .content(objectMapper.writeValueAsString(submission)))
                 .andExpect(status().isOk())
-                .andExpect(content().string("85")); // Expecting total score to be 85
-
-        // Verify interaction with the service layer
-        verify(examService, times(1)).gradeExam(any(ExamSubmissionDTO.class));
-    }
-    @Test
-    void testGetLastAnsweredExamSuccess() throws Exception {
-        // Mocking the service response for fetching the last answered exam
-        Exam mockExam = new Exam();
-        when(examService.getSubmittedExamBySessionId("session123")).thenReturn(mockExam);
-
-        // Simulating a GET request and verifying the response
-        mockMvc.perform(get("/exam/answered")
-                        .param("sessionId", "session123"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").doesNotExist()); // Mock response will not have an ID
-
-        // Verify interaction with the service layer
-        verify(examService, times(1)).getSubmittedExamBySessionId("session123");
+                .andExpect(content().string("85"));
     }
 
+    @Test
+    void registerUser_ShouldReturnUser() throws Exception {
+        User user = new User();
+        when(userService.getUserByUsername(anyString())).thenReturn(null);
+        when(userService.registerUser(anyString())).thenReturn(user);
 
+        mockMvc.perform(post("/api/v1/exam/user")
+                        .param("username", "testUser"))
+                .andExpect(status().isOk());
+    }
 
     @Test
-    void testRegisterUserSuccess() throws Exception {
-        // Mocking user registration behavior
-        User mockUser = new User();
-        mockUser.setUsername("john_doe");
-        when(userService.getUserByUsername("john_doe")).thenReturn(null);
-        when(userService.registerUser("john_doe")).thenReturn(mockUser);
+    void addQuestion_ShouldReturnSuccessResponse() throws Exception {
+        JavaQuizQuestion question = new JavaQuizQuestion();
+        doNothing().when(examService).saveUniqueQuestion(any());
+                //.saveUniqueQuestion(any())).thenReturn(question);
 
-        // Simulating a POST request to register user
-        mockMvc.perform(post("/exam/user")
-                        .param("username", "john_doe"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.username").value("john_doe"));
+        mockMvc.perform(post("/api/v1/exam/question")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(question)))
+                .andExpect(status().isOk());
+    }
 
-        // Verify interaction with service layer
-        verify(userService, times(1)).getUserByUsername("john_doe");
-        verify(userService, times(1)).registerUser("john_doe");
+    @Test
+    void getOneQuestionById_ShouldReturnQuestion() throws Exception {
+        JavaQuizQuestion question = new JavaQuizQuestion();
+        when(examService.getQuestionById(anyLong())).thenReturn(question);
+
+        mockMvc.perform(get("/api/v1/exam/question/1"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void updateQuestion_ShouldReturnUpdatedResponse() throws Exception {
+        JavaQuizQuestion question = new JavaQuizQuestion();
+        doNothing().when(examService).updateQuestion(anyLong(), any());
+
+        mockMvc.perform(put("/api/v1/exam/question/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(question)))
+                .andExpect(status().isOk());
     }
 }

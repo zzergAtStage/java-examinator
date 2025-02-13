@@ -6,6 +6,7 @@ import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.stereotype.Component;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 
 /**
  * @author father
@@ -24,9 +25,9 @@ public class ShutdownEventListener implements ApplicationListener<ContextClosedE
   public void onApplicationEvent(ContextClosedEvent event) {
     if (!exportEnabled) return;
     try {
-      questionFileManagementService.saveQuestionsToFile();
-    } catch (FileNotFoundException e) {
-      throw new RuntimeException(e);
+      questionFileManagementService.createBackup();
+    } catch (IOException e) {
+        throw new RuntimeException(e);
     }
   }
 }

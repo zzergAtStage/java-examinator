@@ -2,104 +2,164 @@ package org.zergatstage.filemanager;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.zergatstage.model.JavaQuizQuestion;
 import org.zergatstage.repository.JavaQuizRepository;
+import org.zergatstage.services.validation.QuestionValidator;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Loads pre initialized  questions
- *
- * @author father
+ * Service responsible for managing question files, including loading initial questions
+ * and periodic backups of the question database.
  */
 @Service
 @RequiredArgsConstructor
-@AllArgsConstructor
 @Slf4j
 public class QuestionFileManagementService {
+  private static final String BACKUP_DIRECTORY = "./data/backups";
+  private static final String BACKUP_FILE_PREFIX = "exam_";
+  private static final String BACKUP_FILE_EXTENSION = ".json";
+  private static final DateTimeFormatter TIMESTAMP_FORMATTER =
+          DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
+
   @Value("${application.questions.file}")
-  private String fileName;
+  private String initialQuestionsFile;
 
   @Value("${application.questions.import.enabled}")
   private Boolean importEnabled;
 
+  @Value("${application.questions.backup.enabled:true}")
+  private Boolean backupEnabled;
 
-  @Autowired
-  private JavaQuizRepository javaQuizRepository;
-  @Autowired
-  private QuizImportService quizImportService;
+  private final JavaQuizRepository javaQuizRepository;
+  private final QuizImportService quizImportService;
+  private final ObjectMapper objectMapper;
+  private final QuestionValidator questionValidator;
 
   @EventListener(ApplicationReadyEvent.class)
   public void onApplicationReady() {
-    if (importEnabled) loadQuestionsFromFile();
+    if (importEnabled) {
+      try {
+        loadInitialQuestions();
+      } catch (Exception e) {
+        log.error("Failed to load initial questions", e);
+      }
+    }
   }
 
+  /**
+   * Loads initial questions from the configured file.
+   * @throws IOException if there's an error reading the file
+   */
+  @Transactional
+  public void loadInitialQuestions() throws IOException {
+    if (initialQuestionsFile == null || initialQuestionsFile.trim().isEmpty()) return;
+    log.info("Loading initial questions from: {}", initialQuestionsFile);
 
-  @SneakyThrows
+    try (InputStream inputStream = getClass().getClassLoader()
+            .getResourceAsStream(initialQuestionsFile)) {
+      if (inputStream == null) {
+        throw new FileNotFoundException("Questions file not found: " + initialQuestionsFile);
+      }
 
-  public void loadQuestionsFromFile() {
-    log.warn("Fill DB with some questions from: {{}}", fileName);
-    InputStream inputStream = getClass().getClassLoader().getResourceAsStream(fileName);
-    if (inputStream == null) {
-      log.warn("Could not find questions file.");
-      return;
+      List<JavaQuizQuestion> questions = objectMapper.readValue(
+              inputStream,
+              new TypeReference<List<JavaQuizQuestion>>() {}
+      );
+
+      AtomicInteger successCount = new AtomicInteger(0);
+      questions.forEach(question -> {
+        try {
+          questionValidator.validate(question);
+          javaQuizRepository.save(question);
+          successCount.incrementAndGet();
+        } catch (Exception e) {
+          log.error("Failed to import question: {}", question, e);
+        }
+      });
+
+      log.info("Successfully imported {} out of {} questions",
+              successCount.get(), questions.size());
     }
-    ObjectMapper mapper = new ObjectMapper();
-    List<JavaQuizQuestion> questions = mapper.readValue(inputStream, new TypeReference<>() {
-    });
-    // Validate and save each question
-    for (JavaQuizQuestion question : questions) {
-      quizImportService.validateQuestion(question);
-    }
-    javaQuizRepository.saveAll(questions); // Save all questions to the repository
   }
-  // Method to save a new version of exam.json to ./data with date-time appended to the filename
 
-// father 11.10.2024:10:44 refactor to eventListener
+  /**
+   * Performs automated backup of questions every day at midnight.
+   */
+  @Scheduled(cron = "0 0 0 * * ?")
+  @Transactional(readOnly = true)
+  public void scheduledBackup() {
+    if (backupEnabled) {
+      try {
+        createBackup();
+        log.info("Scheduled backup completed successfully");
+      } catch (Exception e) {
+        log.error("Scheduled backup failed", e);
+      }
+    }
+  }
 
-  public void saveQuestionsToFile() throws FileNotFoundException {
-    // Fetch all questions from the repository
+  /**
+   * Creates a backup of all questions in the database.
+   * @return Path to the created backup file
+   * @throws IOException if there's an error writing the backup
+   */
+  public Path createBackup() throws IOException {
     List<JavaQuizQuestion> questions = javaQuizRepository.findAllWithChoices();
-    // Ensure all lazy-loaded collections are initialized
-    if (questions.isEmpty()) return;
-    // Format current date-time to append to the filename
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
-    String timestamp = LocalDateTime.now().format(formatter);
-
-    // Create the output filename with date-time appended
-    String newFileName = "exam_" + timestamp + ".json";
-
-    // Define the path where the file should be saved, inside the ./data directory
-    File outputFile = Paths.get("./data", newFileName).toFile();
-
-    // Ensure the directory exists, if not create it
-    if (!outputFile.getParentFile().exists()) {
-      outputFile.getParentFile().mkdirs();
+    if (questions.isEmpty()) {
+      log.warn("No questions found to backup");
+      return null;
     }
 
-    // Use ObjectMapper to write the questions list to the file
-    ObjectMapper mapper = new ObjectMapper();
-    try (FileOutputStream outputStream = new FileOutputStream(outputFile)) {
-      mapper.writerWithDefaultPrettyPrinter().writeValue(outputStream, questions);
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
+    String timestamp = LocalDateTime.now().format(TIMESTAMP_FORMATTER);
+    String filename = BACKUP_FILE_PREFIX + timestamp + BACKUP_FILE_EXTENSION;
+    Path backupDir = Paths.get(BACKUP_DIRECTORY);
+    Path backupFile = backupDir.resolve(filename);
 
-    log.info("Questions saved to file: {}", outputFile.getAbsolutePath());
+    Files.createDirectories(backupDir);
+
+    objectMapper.writerWithDefaultPrettyPrinter()
+            .writeValue(backupFile.toFile(), questions);
+
+    log.info("Created backup with {} questions at: {}",
+            questions.size(), backupFile);
+
+    cleanupOldBackups(backupDir);
+
+    return backupFile;
   }
 
+  /**
+   * Keeps only the last 7 backup files, deleting older ones.
+   */
+  private void cleanupOldBackups(Path backupDir) throws IOException {
+    if (!Files.exists(backupDir)) return;
 
+    List<Path> backupFiles = Files.list(backupDir)
+            .filter(path -> path.getFileName().toString().startsWith(BACKUP_FILE_PREFIX))
+            .sorted((p1, p2) -> p2.getFileName().toString().compareTo(p1.getFileName().toString()))
+            .toList();
+
+    if (backupFiles.size() > 7) {
+      for (int i = 7; i < backupFiles.size(); i++) {
+        Files.delete(backupFiles.get(i));
+        log.debug("Deleted old backup: {}", backupFiles.get(i));
+      }
+    }
+  }
 }
