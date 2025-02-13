@@ -13,6 +13,7 @@ import org.zergatstage.model.User;
 import org.zergatstage.repository.JavaQuizRepository;
 import org.zergatstage.services.ExamService;
 import org.zergatstage.services.UserService;
+import org.zergatstage.services.validation.QuestionValidator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,12 +30,14 @@ public class SimpleWebController {
   private final UserService userService;
   private final HttpSession session;
   private final JavaQuizRepository javaQuizRepository;
+  private final QuestionValidator questionValidator;
 
-  public SimpleWebController(ExamService examService, UserService userService, HttpSession session, JavaQuizRepository repository) {
+  public SimpleWebController(ExamService examService, UserService userService, HttpSession session, JavaQuizRepository repository, QuestionValidator questionValidator) {
     this.examService = examService;
     this.userService = userService;
     this.session = session;
     this.javaQuizRepository = repository;
+      this.questionValidator = questionValidator;
   }
 
   private static String checkUser(String username, RedirectAttributes ra) {
@@ -127,15 +130,12 @@ public class SimpleWebController {
     try {
       Exam exam = examService.getSubmittedExamBySessionId(submissionId);
       examService.deleteSubmission(exam);
-      // Add a success message after deletion
       redirectAttributes.addFlashAttribute("successMessage", "Submission deleted successfully.");
 
     } catch (Exception e) {
-      // Handle the case where the submission might not exist or deletion fails
       redirectAttributes.addFlashAttribute("errorMessage", "Failed to delete submission. Submission not found or another issue occurred.");
     }
-    // Redirect to the submissions page after deletion
-    return "redirect:/submissions"; // Assumed to be the endpoint for the submissions page
+    return "redirect:/submissions";
   }
 
   //some helping endpoint to use prism js library and check hypotheses
@@ -146,6 +146,7 @@ public class SimpleWebController {
       throw new IllegalArgumentException("Question with header: " + question.getQuestionHeader() +
               " already exists");
     }
+    questionValidator.validate(question);
     javaQuizRepository.save(question);
     return "questions";
   }

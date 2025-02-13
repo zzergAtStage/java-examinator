@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="en-US">
+
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -7,6 +8,7 @@
   <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" th:href="@{/css/result.css}">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js"></script>
   <title>Question Builder</title>
   <style>
     .notification {
@@ -21,184 +23,271 @@
       cursor: pointer;
       z-index: 1000;
     }
+
   </style>
 </head>
 
 <body>
-<div th:insert="~{navbar.html :: navbar}"></div>
-<h1>Question Builder</h1>
+  <div th:insert="~{navbar.html :: navbar}"></div>
+  <h1>Question Builder</h1>
 
-<div class="container py-3">
-  <div class="input-group mb-3">
-    <input type="text" class="form-control" id="searchId" placeholder="Enter Question ID" aria-label="Enter Question ID">
-    <button class="btn btn-primary" onclick="fetchQuestionById()">Get Answer</button>
+  <div class="container py-3">
+    <label for="searchId" class="form-label">Update question</label>
+    <div class="input-group mb-3">
+
+      <input type="text" class="form-control" id="searchId" placeholder="Enter Question ID"
+        aria-label="Enter Question ID">
+      <button class="btn btn-primary" onclick="fetchQuestionById()">Get Answer</button>
+    </div>
   </div>
-</div>
 
-<div class="container py-5">
-  <h1>Create a New Java Quiz Question</h1>
-  <form id="questionForm">
-    <div class="mb-3">
-      <label for="questionType" class="form-label">Question Type</label>
-      <select class="form-select" id="questionType" name="questionType">
-        <option value="CODE">Code</option>
-        <option value="SIMPLE">Text</option>
-      </select>
-    </div>
-    <div class="mb-3">
-      <label for="questionHeader" class="form-label">Question Header</label>
-      <input type="text" class="form-control" id="questionHeader" name="questionHeader" required>
-    </div>
-    <div class="mb-3">
-      <label for="questionText" class="form-label">Question Text</label>
-      <textarea class="form-control" id="questionText" name="questionText" rows="5" required></textarea>
-    </div>
-    <div class="mb-3">
-      <label for="difficultyLevel" class="form-label">Difficulty Level</label>
-      <input type="number" class="form-control" id="difficultyLevel" name="difficultyLevel" min="1" max="5" required>
-    </div>
-    <div class="mb-3">
-      <label for="points" class="form-label">Points</label>
-      <input type="number" class="form-control" id="points" name="points" min="1" required>
-    </div>
-    <div class="mb-3">
-      <label for="typeOfAnswer" class="form-label">Answers type</label>
-      <select class="form-select" id="typeOfAnswer" name="typeOfAnswer">
-        <option value="SINGLE">Radio</option>
-        <option value="MULTIPLE">Checkbox (multiple)</option>
-      </select>
-    </div>
-    <div class="mb-3">
-      <label for="correctAnswer" class="form-label">Correct Answer</label>
-      <input type="text" class="form-control" id="correctAnswer" name="correctAnswer" required>
-    </div>
-    <div class="mb-3">
-      <label for="correctAnswerExplanation" class="form-label">Explanation for the Correct Answer</label>
-      <textarea class="form-control" id="correctAnswerExplanation" name="correctAnswerExplanation" rows="3"></textarea>
-    </div>
-    <div class="mb-3">
-      <label for="choices" class="form-label">Answer Choices (comma-separated)</label>
-      <input type="text" class="form-control" id="choices" name="choices" required>
-    </div>
+  <div class="container py-5">
+    <h1>Create a New Quiz Question and Answers</h1>
+    <form id="questionForm">
+      <div class="mb-3">
+        <label for="questionType" class="form-label">Question Type</label>
+        <select class="form-select" id="questionType" name="questionType">
+          <option value="CODE">Code</option>
+          <option value="SIMPLE">Text</option>
+        </select>
+      </div>
+      <div class="mb-3">
+        <label for="questionHeader" class="form-label">Question Header</label>
+        <input type="text" class="form-control" id="questionHeader" name="questionHeader" required>
+      </div>
+      <div class="mb-3">
+        <label for="questionText" class="form-label">Question Text</label>
+        <textarea class="form-control" id="questionText" name="questionText" rows="5" required></textarea>
+      </div>
+      <div class="mb-3">
+        <label for="difficultyLevel" class="form-label">Difficulty Level</label>
+        <input type="number" class="form-control" id="difficultyLevel" name="difficultyLevel" min="1" max="5" required>
+      </div>
+      <div class="mb-3">
+        <label for="points" class="form-label">Points</label>
+        <input type="number" class="form-control" id="points" name="points" min="1" required>
+      </div>
+      <div class="mb-3">
+        <label for="typeOfAnswer" class="form-label">Answers type</label>
+        <select class="form-select" id="typeOfAnswer" name="typeOfAnswer">
+          <option value="SINGLE">Radio (single answer)</option>
+          <option value="MULTIPLE">Checkbox (multiple)</option>
+        </select>
+      </div>
+      <div th:replace="~{fragments/answer-composer :: answerComposer}">stub</div>
+      <script th:replace="~{fragments/answer-composer :: answerComposerScript}">stub</script>
 
-    <!-- Dynamic Button -->
-    <button type="button" class="btn btn-success" id="actionButton" onclick="submitForm()">Create Question</button>
-  </form>
-</div>
 
-<div id="notification" class="notification" style="display: none;" onclick="hideNotification()">
-  Question added successfully!
-</div>
+      <!-- Keep these fields but make them hidden -->
+      <input type="hidden" id="composerCorrectAnswer" name="correctAnswer">
+      <input type="hidden" id="composerChoices" name="choices">
+      
+      <input type="hidden" id="correctAnswer" name="correctAnswerOld">
+      <input type="hidden" id="choices" name="choicesOld">
 
-<script>
-  let currentQuestionId = null;
+      <div class="mb-3">
+        <label for="questionText" class="form-label">Answer explanation (propably)</label>
+        <textarea class="form-control" id="correctAnswerExplanation" name="correctAnswerExplanation"
+           rows="5" required></textarea>
+      </div>
+      
+      <!-- Dynamic Button -->
+      
+      <button type="button" class="btn btn-success" id="actionButton" onclick="submitForm()">Create Question</button>
+    </form>
+  </div>
 
-  function submitForm() {
+  <div id="notification" class="notification" style="display: none;" onclick="hideNotification()">
+    Question added successfully!
+  </div>
+
+  <script>
+    let currentQuestionId = null;
+    let message = '';
+
+    function submitForm() {
       if (currentQuestionId) {
-          updateQuestion(currentQuestionId);
+        updateQuestion(currentQuestionId);
       } else {
-          createQuestion();
+        createQuestion();
       }
-  }
+    }
 
-  function createQuestion() {
+    function createQuestion() {
       const formData = collectFormData();
-      fetch('/api/v1/exam/addQuestion', {
-          method: 'POST',
-          headers: {
-              'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(formData)
+      fetch('/api/v1/exam/question', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
       })
-      .then(response => response.json())
-      .then(data => showNotification("Question added successfully!"))
-      .catch(error => showNotification("Failed to add question."))
-      .finally(() => resetPage());
-  }
+        .then(response => response.json())
+        .then(data => showNotification("Question added successfully!"))
+        .catch(error => 
+        {
+          console.error(error);
+          showNotification("Failed to add question.");
+        })
+        .finally(() => resetPage());
+    }
 
-  function updateQuestion(id) {
+    function updateQuestion(id) {
       const formData = collectFormData();
-      fetch(`/api/v1/exam/update-question/${id}`, {
-          method: 'PUT',
-          headers: {
-              'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(formData)
+      fetch(`/api/v1/exam/question/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
       })
-      .then(response => response.json())
-      .then(data => showNotification("Question updated successfully!"))
-      .catch(error => showNotification("Failed to update question."))
-      .finally(() => resetPage());
-  }
+        .then(response => response.json())
+        .then(data => showNotification("Question updated successfully!"))
+        .catch(error => showNotification("Failed to update question."))
+        .finally(() => resetPage());
+    }
 
-  function fetchQuestionById() {
+    function fetchQuestionById() {
       const questionId = document.getElementById('searchId').value;
       if (!questionId) {
-          showNotification("Please enter a valid Question ID.");
-          return;
+        showNotification("Please enter a valid Question ID.");
+        return;
       }
 
       fetch(`/api/v1/exam/question/${questionId}`)
-          .then(response => {
-              if (!response.ok) throw new Error("Question not found.");
-              return response.json();
-          })
-          .then(data => {
-              populateForm(data);
-              currentQuestionId = questionId;
-              document.getElementById('actionButton').textContent = "Update Question";
-          })
-          .catch(error => showNotification("Failed to fetch question."));
-  }
+        .then(response => {
+          if (!response.ok) throw new Error("Question not found.");
+          return response.json();
+        })
+        .then(data => {
+          populateForm(data);
+          showNotification("Fetched successful.");
+          currentQuestionId = questionId;
+          document.getElementById('actionButton').textContent = "Update Question";
+        })
+        .catch(error => {
+          console.error(error);
+          showNotification("Failed to fetch question.");
+        });
+    }
 
-  function populateForm(data) {
-    console.log("'document.getElementById('typeOfAnswer').value = " + document.getElementById('typeOfAnswer').value);
-    
+    function populateForm(data) {
+      console.log("'document.getElementById('typeOfAnswer').value = " + document.getElementById('typeOfAnswer').value);
+
+      // Set basic form fields
       document.getElementById('questionType').value = data.questionType;
       document.getElementById('questionHeader').value = data.questionHeader;
       document.getElementById('questionText').value = data.questionText;
       document.getElementById('difficultyLevel').value = data.difficultyLevel;
       document.getElementById('points').value = data.points;
       document.getElementById('typeOfAnswer').value = data.typeOfAnswer;
-      document.getElementById('correctAnswer').value = data.correctAnswers.join(',');
       document.getElementById('correctAnswerExplanation').value = data.correctAnswerExplanation;
-      document.getElementById('choices').value = data.choices.join(',');
-  }
 
-  function collectFormData() {
-      return {
-          questionType: document.getElementById('questionType').value,
-          questionHeader: document.getElementById('questionHeader').value,
-          questionText: document.getElementById('questionText').value,
-          difficultyLevel: document.getElementById('difficultyLevel').value,
-          points: document.getElementById('points').value,
-          typeOfAnswer: document.getElementById('typeOfAnswer').value,
-          correctAnswers: document.getElementById('correctAnswer').value.split(','),
-          correctAnswerExplanation: document.getElementById('correctAnswerExplanation').value,
-          choices: document.getElementById('choices').value.split(',')
-      };
-  }
+      // Clear existing answers except template
+      const container = document.getElementById('answersContainer');
+      const template = container.querySelector('.answer-template');
+      container.innerHTML = '';
+      container.appendChild(template);
 
-  function showNotification(message) {
+      // Convert choices and correctAnswers to arrays if they're strings
+      const choices = Array.isArray(data.choices) ? data.choices : data.choices.split(',');
+      const correctAnswers = Array.isArray(data.correctAnswers)
+        ? data.correctAnswers
+        : data.correctAnswers.split(',');
+
+      // Add each answer option
+      choices.forEach(choice => {
+        const newAnswer = template.cloneNode(true);
+        newAnswer.classList.remove('answer-template', 'd-none');
+        newAnswer.classList.add('answer-item');
+
+        const textInput = newAnswer.querySelector('.answer-text');
+        const correctCheckbox = newAnswer.querySelector('.answer-correct');
+
+        textInput.value = choice.trim();
+        correctCheckbox.checked = correctAnswers.some(answer =>
+          answer.trim() === choice.trim()
+        );
+
+        // Add event listeners
+        newAnswer.querySelector('.answer-correct').addEventListener('change', QuizAnswerComposer.updateCorrectAnswers);
+        newAnswer.querySelector('.answer-text').addEventListener('input', QuizAnswerComposer.updateAnswersJson);
+        newAnswer.querySelector('.delete-answer').addEventListener('click', QuizAnswerComposer.deleteAnswer);
+
+        container.appendChild(newAnswer);
+      });
+
+      // Update the hidden fields
+      QuizAnswerComposer.updateAnswersJson();
+
+      // Set the old hidden fields for backward compatibility
+      document.getElementById('correctAnswer').value = correctAnswers.join(',');
+      document.getElementById('choices').value = choices.join(',');
+    }
+
+    function collectFormData() {
+    // Get the answers data from the answer composer
+    const answers = [];
+    document.querySelectorAll('.answer-item').forEach(item => {
+        const answerText = item.querySelector('.answer-text').value.trim();
+        const isCorrect = item.querySelector('.answer-correct').checked;
+        if (answerText) {  // Only include non-empty answers
+            answers.push({
+                text: answerText,
+                correct: isCorrect
+            });
+        }
+    });
+
+    // Extract correct answers and all choices from the answers array
+    const correctAnswers = answers
+        .filter(answer => answer.correct)
+        .map(answer => answer.text);
+
+    const choices = answers
+        .map(answer => answer.text);
+
+    return {
+        questionType: document.getElementById('questionType').value,
+        questionHeader: document.getElementById('questionHeader').value,
+        questionText: document.getElementById('questionText').value,
+        difficultyLevel: document.getElementById('difficultyLevel').value,
+        points: document.getElementById('points').value,
+        typeOfAnswer: document.getElementById('typeOfAnswer').value,
+        correctAnswers: correctAnswers,
+        correctAnswerExplanation: document.getElementById('correctAnswerExplanation').value,
+        choices: choices,
+        // Include the full answers data structure if needed by the backend
+        answersData: {
+            questionType: document.getElementById('typeOfAnswer').value,
+            answers: answers
+        }
+    };
+}
+
+    function showNotification(message) {
       const notification = document.getElementById('notification');
+      if (message && message.includes("Failed")) {
+        document.getElementById('notification').style.backgroundColor = "crimson";
+      }
       notification.textContent = message;
       notification.style.display = 'block';
       setTimeout(() => notification.style.display = 'none', 5000);
-  }
+    }
 
-  function hideNotification() {
+    function hideNotification() {
       document.getElementById('notification').style.display = 'none';
-  }
+    }
 
-  function resetPage() {
+    function resetPage() {
       currentQuestionId = null;
       document.getElementById('questionForm').reset();
       document.getElementById('actionButton').textContent = "Create Question";
       setTimeout(() => window.location.reload(), 500);  // Reload the page to reset state
-  }
-</script>
+    }
+  </script>
 
-<div th:insert="~{footer.html :: footer}"></div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js"></script>
+  <div th:insert="~{footer.html :: footer}"></div>
 </body>
+
 </html>

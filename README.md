@@ -1,4 +1,4 @@
-# Quiz App (java-examinator)
+# Quiz App (java-examination)
  ## Summary
 The application is designed for use both as a standalone Spring Boot MVC application and as part of a microservice module (see the relevant section).
 ## Features
@@ -77,13 +77,14 @@ curl --location 'localhost:8080/api/quiz/import' \
 ![Quiz page](./docs/images/quiz-question.png)
 4. Results page:
 ![Resul](./docs/images/result.png)
-6. Review page:
+5. Review page:
 ![Review](./docs/images/review-page.png)
 6. Review with wrong answer:
 ![Review code](./docs/images/review-wrong-code.png)
 7. Error page:
 ![Error page](./docs/images/error-page.png)
-1. Question builder page (follow the link )  
-Lets user edit question, set multi choice answers etc.
+8. Question builder page (follow the link )  
+Lets user edit question, set multi choice answers etc. When you want to keep code - format it well)
 ![Question builder](docs/images/quistion-builder.png)
-
+ 8.1 New version of answer composing:
+![Question builder](docs/images/setup-answers.png)

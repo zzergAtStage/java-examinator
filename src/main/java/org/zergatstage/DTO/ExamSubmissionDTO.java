@@ -19,6 +19,6 @@ import java.util.stream.Collectors;
 public class ExamSubmissionDTO {
     private String sessionId;
     private Long userId;
-    private Map<String, List<UserAnswerDTO>> sectionAnswers; // Section name as key, list of answers as value
+    private Map<String, List<UserAnswerDTO>> sectionAnswers;
 
 }

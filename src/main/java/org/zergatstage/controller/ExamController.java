@@ -15,7 +15,8 @@ import org.zergatstage.services.UserService;
  * @author father
  */
 @RestController
-@RequestMapping("/api/v1/exam")
+
+@RequestMapping(produces = "application/json", path = "/api/v1/exam")
 public class ExamController {
 
     private final ExamService examService;
@@ -27,15 +28,16 @@ public class ExamController {
     }
 
     @GetMapping("/generate")
-    public ResponseEntity<Exam> generateQuiz(@RequestParam int difficulty, int numberQuestions){
+    public ResponseEntity<Exam> generateQuiz(@RequestParam int difficulty, int numberQuestions) {
         return ResponseEntity.ok(examService.getExam(difficulty, numberQuestions));
     }
 
     @GetMapping("/answered")
-    public ResponseEntity<Exam> getLastAnsweredExam(@RequestParam String sessionId){
+    public ResponseEntity<Exam> getLastAnsweredExam(@RequestParam String sessionId) {
         Exam exam = examService.getSubmittedExamBySessionId(sessionId);
         return ResponseEntity.ok(exam);
     }
+
     @PostMapping("/submit")
     public ResponseEntity<Integer> submitExam(@RequestBody ExamSubmissionDTO submission) {
         int totalScore = examService.gradeExam(submission);
@@ -43,7 +45,7 @@ public class ExamController {
     }
 
     @PostMapping("/user")
-    public ResponseEntity<User> registerUser(@RequestParam String username){
+    public ResponseEntity<User> registerUser(@RequestParam String username) {
         User user = userService.getUserByUsername(username);
         if (user == null) {
             user = userService.registerUser(username);
@@ -52,25 +54,25 @@ public class ExamController {
         return ResponseEntity.ok(user);
     }
 
-    @PostMapping("/addQuestion")
+    @PostMapping("/question")
     public ResponseEntity<ResponseDTO> addQuestion(@RequestBody JavaQuizQuestion javaQuizQuestion) {
-        ResponseDTO responseDTO = new ResponseDTO();
-            // Save the question to the database
-            examService.saveUniqueQuestion(javaQuizQuestion);
-            //TODO 8.10.2024 father: Refactor this.
-            // Return a success message
-            responseDTO.setBusinessMessage("Success");
-            return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+
+        examService.saveUniqueQuestion(javaQuizQuestion);
+        ResponseDTO responseDTO = ResponseDTO.builder()
+                .businessMessage("Success")
+                .build();
+        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
+
     @GetMapping("/question/{id}")
     public ResponseEntity<JavaQuizQuestion> getOneQuestionById(@PathVariable("id") Long id) {
         JavaQuizQuestion javaQuizQuestion = examService.getQuestionById(id);
         return new ResponseEntity<>(javaQuizQuestion, HttpStatus.OK);
     }
 
-    @PutMapping("/update-question/{id}")
+    @PutMapping("/question/{id}")
     public ResponseEntity<ResponseDTO> updateQuestion(@PathVariable("id") Long id, @RequestBody JavaQuizQuestion question) {
-        examService.updateQuestion(id,question);
+        examService.updateQuestion(id, question);
         return new ResponseEntity<>(ResponseDTO.builder().businessMessage("Updated").build(), HttpStatus.OK);
     }
 }
