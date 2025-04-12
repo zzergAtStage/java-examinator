@@ -1,0 +1,64 @@
+pipeline {
+    agent {
+        docker {
+            image 'maven:3.9.4-eclipse-temurin-17'
+            args '-v /var/run/docker.sock:/var/run/docker.sock'
+        }
+    }
+
+    environment {
+        APP_NAME = "application/java-examinator"
+        APP_VERSION = "0.0.1-SNAPSHOT"
+        JAR_FILE = "target/java-examinator-${APP_VERSION}.jar"
+        JAR_PORT = "8080"
+    }
+
+    options {
+        timestamps() // Add timestamps to build log
+    }
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Build JAR') {
+            steps {
+                echo "🔨 Building the JAR file..."
+                sh "mvn clean package -DskipTests"
+            }
+        }
+
+        stage('Remove old image') {
+            steps {
+                echo "🧹 Removing old Docker image..."
+                sh "docker rmi ${APP_NAME}:naive || true"
+            }
+        }
+
+        stage('Build Docker image') {
+            steps {
+                echo "🐳 Building Docker image..."
+                sh '''
+                    docker build -f ./build-scripts/docker/basic/Dockerfile \
+                        --build-arg JAR_FILE=${JAR_FILE} \
+                        --build-arg JAR_PORT=${JAR_PORT} \
+                        -t ${APP_NAME}:latest \
+                        -t ${APP_NAME}:naive .
+                '''
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "✅ Build succeeded!"
+        }
+        failure {
+            echo "❌ Build failed."
+        }
+    }
+}
