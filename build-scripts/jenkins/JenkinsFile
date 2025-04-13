@@ -1,6 +1,11 @@
 pipeline {
     agent any
-
+    
+    tools {
+        // Define Maven tool installation
+        maven 'mvn' // Use the name of your Maven installation as configured in Jenkins
+    }
+    
     environment {
         APP_NAME = 'application/java-examinator'
         APP_VERSION = '0.0.1-SNAPSHOT'
@@ -8,20 +13,20 @@ pipeline {
         KUBERNETES_CONTEXT = 'minikube'
         NAMESPACE = 'default'
     }
-
+    
     stages {
         stage('Checkout') {
             steps {
                 checkout scm
             }
         }
-
+        
         stage('Build JAR') {
             steps {
                 sh 'mvn clean package -DskipTests'
             }
         }
-
+        
         stage('Build Docker Image') {
             steps {
                 script {
@@ -29,13 +34,13 @@ pipeline {
                         "${env.DOCKER_REGISTRY}/${env.APP_NAME}:${env.BUILD_NUMBER}",
                         "--build-arg JAR_FILE=./target/java-examinator-${env.APP_VERSION}.jar --build-arg JAR_PORT=8080 -f Dockerfile ."
                     )
-
+                    
                     dockerImage.push()
                     dockerImage.push('latest')
                 }
             }
         }
-
+        
         stage('Deploy to Minikube') {
             steps {
                 withKubeConfig([credentialsId: 'minikube-credentials', contextName: env.KUBERNETES_CONTEXT]) {
@@ -48,7 +53,7 @@ pipeline {
             }
         }
     }
-
+    
     post {
         always {
             cleanWs()
