@@ -9,7 +9,7 @@ pipeline {
     environment {
         APP_NAME = 'application/java-examinator'
         APP_VERSION = '0.0.1-SNAPSHOT'
-        DOCKER_REGISTRY = 'your-registry.com' // Replace with your Docker registry
+        DOCKER_REGISTRY = 'http://192.168.1.113:5000/v2/_catalog' // Replace with your Docker registry
         KUBERNETES_CONTEXT = 'minikube'
         NAMESPACE = 'default'
     }
