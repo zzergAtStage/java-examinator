@@ -1,24 +1,15 @@
 pipeline {
-    agent {
-        docker {
-            image 'maven:3.9.4-eclipse-temurin-17'
-            args '-v /var/run/docker.sock:/var/run/docker.sock'
-        }
-    }
+    agent any
 
     environment {
-        APP_NAME = "application/java-examinator"
-        APP_VERSION = "0.0.1-SNAPSHOT"
-        JAR_FILE = "target/java-examinator-${APP_VERSION}.jar"
-        JAR_PORT = "8080"
-    }
-
-    options {
-        timestamps() // Add timestamps to build log
+        APP_NAME = 'application/java-examinator'
+        APP_VERSION = '0.0.1-SNAPSHOT'
+        DOCKER_REGISTRY = 'your-registry.com' // Replace with your Docker registry
+        KUBERNETES_CONTEXT = 'minikube'
+        NAMESPACE = 'default'
     }
 
     stages {
-
         stage('Checkout') {
             steps {
                 checkout scm
@@ -27,38 +18,40 @@ pipeline {
 
         stage('Build JAR') {
             steps {
-                echo "🔨 Building the JAR file..."
-                sh "mvn clean package -DskipTests"
+                sh 'mvn clean package -DskipTests'
             }
         }
 
-        stage('Remove old image') {
+        stage('Build Docker Image') {
             steps {
-                echo "🧹 Removing old Docker image..."
-                sh "docker rmi ${APP_NAME}:naive || true"
+                script {
+                    def dockerImage = docker.build(
+                        "${env.DOCKER_REGISTRY}/${env.APP_NAME}:${env.BUILD_NUMBER}",
+                        "--build-arg JAR_FILE=./target/java-examinator-${env.APP_VERSION}.jar --build-arg JAR_PORT=8080 -f Dockerfile ."
+                    )
+
+                    dockerImage.push()
+                    dockerImage.push('latest')
+                }
             }
         }
 
-        stage('Build Docker image') {
+        stage('Deploy to Minikube') {
             steps {
-                echo "🐳 Building Docker image..."
-                sh '''
-                    docker build -f ./build-scripts/docker/basic/Dockerfile \
-                        --build-arg JAR_FILE=${JAR_FILE} \
-                        --build-arg JAR_PORT=${JAR_PORT} \
-                        -t ${APP_NAME}:latest \
-                        -t ${APP_NAME}:naive .
-                '''
+                withKubeConfig([credentialsId: 'minikube-credentials', contextName: env.KUBERNETES_CONTEXT]) {
+                    sh '''
+                        kubectl apply -f k8s/deployment.yaml -n ${NAMESPACE}
+                        kubectl apply -f k8s/service.yaml -n ${NAMESPACE}
+                        kubectl set image deployment/java-examinator-deployment java-examinator=${DOCKER_REGISTRY}/${APP_NAME}:${BUILD_NUMBER} -n ${NAMESPACE}
+                    '''
+                }
             }
         }
     }
 
     post {
-        success {
-            echo "✅ Build succeeded!"
-        }
-        failure {
-            echo "❌ Build failed."
+        always {
+            cleanWs()
         }
     }
 }
