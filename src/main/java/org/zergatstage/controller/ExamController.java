@@ -15,7 +15,6 @@ import org.zergatstage.services.UserService;
  * @author father
  */
 @RestController
-
 @RequestMapping(produces = "application/json", path = "/api/v1/exam")
 public class ExamController {
 

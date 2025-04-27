@@ -11,7 +11,7 @@
   <title>Result Page</title>
 </head>
 
-<body>
+<body class="d-flex flex-column h-100">
 
   <!-- Importing NavBar -->
   <div th:insert="~{navbar.html :: navbar}"></div>
@@ -70,5 +70,5 @@
 </body>
 
 <!-- Importing Footer -->
-<footer th:insert="~{footer.html :: footer}"></footer>
+<footer th:replace="~{footer.html :: footer}"></footer>
 </html>

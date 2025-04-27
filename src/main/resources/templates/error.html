@@ -10,7 +10,7 @@
   <link rel="stylesheet" th:href="@{/css/index.css}">
   <title>Error Page</title>
 </head>
-<body>
+<body class="d-flex flex-column h-100">
 
 <!-- Importing NavBar -->
 <div th:replace="~{navbar.html :: navbar}"></div>
@@ -34,7 +34,7 @@
 </div>
 
 <!-- Importing Footer -->
-<div th:replace="~{footer.html :: footer}"></div>
+<footer th:replace="~{footer.html :: footer}"></footer>
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js"></script>

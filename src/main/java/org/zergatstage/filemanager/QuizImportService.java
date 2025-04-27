@@ -116,4 +116,7 @@ public class QuizImportService {
         javaQuizRepository.saveAll(questions);
     }
 
+    public void dropImport() {
+        javaQuizRepository.deleteAll();
+    }
 }

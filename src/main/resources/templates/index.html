@@ -4,13 +4,13 @@
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" th:href="@{/css/index.css}">
     <title>Home Page</title>
 </head>
-<body>
+<body class="d-flex flex-column h-100">
 
 <!-- Importing NavBar -->
 <div th:replace="~{navbar.html :: navbar}"></div>
@@ -24,19 +24,17 @@
         <h1 class="mb-5 text-center">Quiz App</h1>
         <form class="card bg-dark py-5 px-4" action="/register" method="POST">
             <p>Enter Your Name</p>
-            <input type="text" name="username" required />
+            <input type="text" name="username" required/>
             <p class="text-danger warning" th:if="${warning}" th:text="${warning}"></p>
             <button type="submit" class="btn btn-warning">Register user</button>
         </form>
     </div>
 </div>
-
-
-
+<!-- Importing Footer -->
+<footer th:replace="~{footer.html :: footer}"></footer>
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
-<!-- Importing Footer -->
-<footer th:replace="~{footer.html :: footer}"></footer>
+
 </html>

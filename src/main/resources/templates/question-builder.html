@@ -27,7 +27,7 @@
   </style>
 </head>
 
-<body>
+<body class="d-flex flex-column h-100">
   <div th:insert="~{navbar.html :: navbar}"></div>
   <h1>Question Builder</h1>
 
@@ -49,6 +49,7 @@
         <select class="form-select" id="questionType" name="questionType">
           <option value="CODE">Code</option>
           <option value="SIMPLE">Text</option>
+          <option value="FILL_THE_GAP">Fill the gap</option>
         </select>
       </div>
       <div class="mb-3">
@@ -72,6 +73,7 @@
         <select class="form-select" id="typeOfAnswer" name="typeOfAnswer">
           <option value="SINGLE">Radio (single answer)</option>
           <option value="MULTIPLE">Checkbox (multiple)</option>
+          <option value="INPUT">Input box</option>
         </select>
       </div>
       <div th:replace="~{fragments/answer-composer :: answerComposer}">stub</div>
@@ -289,7 +291,7 @@
       currentQuestionId = null;
       document.getElementById('questionForm').reset();
       document.getElementById('actionButton').textContent = "Create Question";
-      setTimeout(() => window.location.reload(), 500);  // Reload the page to reset state
+      //setTimeout(() => window.location.reload(), 500);  // Reload the page to reset state
     }
   </script>
 

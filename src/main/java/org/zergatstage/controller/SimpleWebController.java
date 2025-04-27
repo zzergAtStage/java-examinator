@@ -94,7 +94,7 @@ public class SimpleWebController {
     String x = checkUser(username, ra);
     if (x != null) return x; //redirect
     User user = userService.getUserByUsername(username);
-    Exam qForm = examService.getExam(user, 2, 2);// TODO: replace fetch from model
+    Exam qForm = examService.getExam(user, 3, 20);// TODO: replace fetch from model
     m.addAttribute("qForm", qForm);
     return "quiz";
   }

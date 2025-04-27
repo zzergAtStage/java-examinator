@@ -132,14 +132,16 @@ public class ExamService {
    */
   public Exam getExam(User user, int difficulty, int numberQuestions) {
     List<JavaQuizQuestion> questions = questionRepository.findByDifficultyLevelLessThanEqual(difficulty);
+    //PoC - view all questions
     // Ensure we have enough questions to create 3 sections with the specified number of questions
-    if (questions.size() < 3 * numberQuestions) {
+    if (questions.isEmpty()) {
       throw new IllegalArgumentException("Not enough questions available for the exam.");
     }
     Collections.shuffle(questions);
     Queue<JavaQuizQuestion> queue = new ArrayDeque<>(questions);
     List<ExamSection> sections = new ArrayList<>();
     for (int i = 0; i < SECTIONS_NUMBER; i++) {
+      if (queue.isEmpty()) break;
       sections.add(ExamSection.builder()
               .sectionName("Section #" + (i + 1))
               .questions(getQuestionsPool(queue, numberQuestions))
