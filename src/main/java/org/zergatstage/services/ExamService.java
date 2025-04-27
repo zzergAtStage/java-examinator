@@ -1,8 +1,10 @@
 package org.zergatstage.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 import org.zergatstage.DTO.ExamSubmissionDTO;
 import org.zergatstage.DTO.UserAnswerDTO;
 import org.zergatstage.model.*;
@@ -224,7 +226,7 @@ public class ExamService {
 
   public JavaQuizQuestion getQuestionById(Long id) {
     return questionRepository.findById(id).orElseThrow(() ->
-            new IllegalArgumentException("No question with id " + id + " is found"));
+            new ResponseStatusException(HttpStatus.NOT_FOUND, "No question with id " + id + " is found"));
   }
 
   public void updateQuestion(Long id, JavaQuizQuestion question) {

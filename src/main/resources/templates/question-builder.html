@@ -154,7 +154,13 @@
         return;
       }
 
-      fetch(`/api/v1/exam/question/${questionId}`)
+      fetch(`/api/v1/exam/question/${questionId}`,
+      {
+        headers: {
+            'Accept': 'application/json'
+        }
+      }
+      )
         .then(response => {
           if (!response.ok) throw new Error("Question not found.");
           return response.json();

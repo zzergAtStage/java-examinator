@@ -50,12 +50,7 @@ h1 {
 	font-weight: 500;
 	color: #a5b8cc;
 }
-
-
-
-footer {
-	height: 80px;
-	text-align: center;
-	line-height: 80px;
-	padding: 10px, 0;
+.my-4 {
+    margin-top: 1.5rem !important;
+    margin-bottom: 0 !important
 }

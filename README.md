@@ -65,7 +65,7 @@ http://localhost:8080
 Run command:   
 ```bash
 curl --location 'localhost:8080/api/quiz/import' \
---form 'quiz=@"/<your custom data path>/data/exam.json"'
+--form 'quiz=@"/<your custom data full OS path>/data/exam.json"'
 ```
 
 ## Screenshoots

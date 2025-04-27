@@ -33,9 +33,7 @@ img {
 .card button {
 	width: 45%;
 }
-
-footer {
-	height: 80px;
-	text-align: center;
-	line-height: 80px;
+.my-4 {
+    margin-top: 1.5rem !important;
+    margin-bottom: 0 !important
 }
