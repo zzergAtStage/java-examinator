@@ -51,7 +51,12 @@ public class ExamService {
     for (ExamSection section : exam.getSections()) {
       for (Questions questions : section.getQuestions()) {
         result = getTotalScore(questions.getQuestion(), questions, result);
-        userAnswerRepository.save(questions);
+        try {
+          userAnswerRepository.save(questions);
+        } catch (Exception e) {
+          e.printStackTrace();
+          throw e;
+        }
       }
     }
     examRepository.save(exam);
