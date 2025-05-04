@@ -1,10 +1,10 @@
 package org.zergatstage.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.zergatstage.model.ExamSection;
+import org.zergatstage.model.Section;
 
 /**
  * @author father
  */
-public interface ExamSectionRepository extends JpaRepository<ExamSection, Long> {
+public interface SectionRepository extends JpaRepository<Section, Long> {
 }

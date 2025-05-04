@@ -10,22 +10,21 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.multipart.MultipartFile;
-import org.zergatstage.model.JavaQuizQuestion;
-import org.zergatstage.repository.JavaQuizRepository;
+import org.zergatstage.model.Question;
+import org.zergatstage.repository.QuestionRepository;
 import org.zergatstage.services.validation.QuestionValidator;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class QuizImportServiceTest {
 
     @Mock
-    private JavaQuizRepository javaQuizRepository;
+    private QuestionRepository questionRepository;
 
     @Mock
     private QuestionValidator questionValidator;
@@ -40,7 +39,7 @@ class QuizImportServiceTest {
 
     @BeforeEach
     void setUp() {
-        quizImportService = new QuizImportService(javaQuizRepository, objectMapper, questionValidator);
+        quizImportService = new QuizImportService(questionRepository, objectMapper, questionValidator);
     }
 
     @Test
@@ -68,10 +67,10 @@ class QuizImportServiceTest {
         quizImportService.importQuizQuestions(file);
 
         // Then
-        ArgumentCaptor<List<JavaQuizQuestion>> captor = ArgumentCaptor.forClass(List.class);
-        verify(javaQuizRepository, times(1)).saveAll(captor.capture());
+        ArgumentCaptor<List<Question>> captor = ArgumentCaptor.forClass(List.class);
+        verify(questionRepository, times(1)).saveAll(captor.capture());
 
-        List<JavaQuizQuestion> savedQuestions = captor.getValue();
+        List<Question> savedQuestions = captor.getValue();
         assertEquals(1, savedQuestions.size());
         assertEquals("What is Java?", savedQuestions.get(0).getQuestionHeader());
         assertEquals(List.of("A programming language"), savedQuestions.get(0).getCorrectAnswers());
@@ -102,10 +101,10 @@ class QuizImportServiceTest {
         quizImportService.importQuizQuestions(file);
 
         // Then
-        ArgumentCaptor<List<JavaQuizQuestion>> captor = ArgumentCaptor.forClass(List.class);
-        verify(javaQuizRepository).saveAll(captor.capture());
+        ArgumentCaptor<List<Question>> captor = ArgumentCaptor.forClass(List.class);
+        verify(questionRepository).saveAll(captor.capture());
 
-        List<JavaQuizQuestion> savedQuestions = captor.getValue();
+        List<Question> savedQuestions = captor.getValue();
         assertEquals(1, savedQuestions.size());
         assertEquals("What is Java?", savedQuestions.get(0).getQuestionHeader());
         assertEquals(List.of("A programming language"), savedQuestions.get(0).getCorrectAnswers());
@@ -130,7 +129,7 @@ class QuizImportServiceTest {
 
         // When & Then
         assertThrows(IOException.class, () -> quizImportService.importQuizQuestions(file));
-        verify(javaQuizRepository, never()).saveAll(any());
+        verify(questionRepository, never()).saveAll(any());
     }
 
     @Test
@@ -140,7 +139,7 @@ class QuizImportServiceTest {
 
         // When & Then
         assertThrows(IllegalArgumentException.class, () -> quizImportService.importQuizQuestions(file));
-        verify(javaQuizRepository, never()).saveAll(any());
+        verify(questionRepository, never()).saveAll(any());
     }
 
     @Test
@@ -168,14 +167,14 @@ class QuizImportServiceTest {
         quizImportService.importQuizQuestions(file);
 
         // Then
-        ArgumentCaptor<List<JavaQuizQuestion>> captor = ArgumentCaptor.forClass(List.class);
-        verify(javaQuizRepository, times(1)).saveAll(captor.capture());
+        ArgumentCaptor<List<Question>> captor = ArgumentCaptor.forClass(List.class);
+        verify(questionRepository, times(1)).saveAll(captor.capture());
 
-        List<JavaQuizQuestion> savedQuestions = captor.getValue();
+        List<Question> savedQuestions = captor.getValue();
         assertEquals(1, savedQuestions.size());
         assertEquals("What is OOP?", savedQuestions.get(0).getQuestionHeader());
 
         // Ensure validation was called
-        verify(questionValidator, times(1)).validate(any(JavaQuizQuestion.class));
+        verify(questionValidator, times(1)).validate(any(Question.class));
     }
 }

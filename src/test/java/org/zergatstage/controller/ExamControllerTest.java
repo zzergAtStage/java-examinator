@@ -10,7 +10,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.zergatstage.DTO.ExamSubmissionDTO;
 import org.zergatstage.model.Exam;
-import org.zergatstage.model.JavaQuizQuestion;
+import org.zergatstage.model.Question;
 import org.zergatstage.model.User;
 import org.zergatstage.services.ExamService;
 import org.zergatstage.services.UserService;
@@ -90,7 +90,7 @@ class ExamControllerTest {
 
     @Test
     void addQuestion_ShouldReturnSuccessResponse() throws Exception {
-        JavaQuizQuestion question = new JavaQuizQuestion();
+        Question question = new Question();
         doNothing().when(examService).saveUniqueQuestion(any());
                 //.saveUniqueQuestion(any())).thenReturn(question);
 
@@ -102,7 +102,7 @@ class ExamControllerTest {
 
     @Test
     void getOneQuestionById_ShouldReturnQuestion() throws Exception {
-        JavaQuizQuestion question = new JavaQuizQuestion();
+        Question question = new Question();
         when(examService.getQuestionById(anyLong())).thenReturn(question);
 
         mockMvc.perform(get("/api/v1/exam/question/1"))
@@ -111,7 +111,7 @@ class ExamControllerTest {
 
     @Test
     void updateQuestion_ShouldReturnUpdatedResponse() throws Exception {
-        JavaQuizQuestion question = new JavaQuizQuestion();
+        Question question = new Question();
         doNothing().when(examService).updateQuestion(anyLong(), any());
 
         mockMvc.perform(put("/api/v1/exam/question/1")

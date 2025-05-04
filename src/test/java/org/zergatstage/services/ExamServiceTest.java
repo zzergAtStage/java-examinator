@@ -23,18 +23,18 @@ class ExamServiceTest {
   private ExamService examService; // Service under test
 
   @Mock
-  private JavaQuizRepository questionRepository;
+  private QuestionRepository questionRepository;
 
   @Mock
-  private ExamRepository examRepository;
+  private QuizRepository quizRepository;
 
   @Mock
-  private ExamSectionRepository examSectionRepository;
+  private SectionRepository sectionRepository;
 
   @Mock
   private QuizAnswerService quizAnswerService;
   @Mock
-  private UserAnswerRepository userAnswerRepository;
+  private QuizAttemptRepository quizAttemptRepository;
 
   @Mock
   private UserRepository userRepository;
@@ -73,7 +73,7 @@ class ExamServiceTest {
     submission.setSectionAnswers(Map.of("Section1", sectionAnswers));
 
     // Mocking questions and answers
-    JavaQuizQuestion question = JavaQuizQuestion.builder()
+    Question question = Question.builder()
             .id(1L)
             .correctAnswer("Answer1")
             .points(5)
@@ -82,12 +82,12 @@ class ExamServiceTest {
 
     // Mock exam and section save operations
     Exam mockExam = new Exam();
-    when(examRepository.save(any(Exam.class))).thenReturn(mockExam);
-    ExamSection mockSection = new ExamSection();
-    when(examSectionRepository.save(any(ExamSection.class))).thenReturn(mockSection);
+    when(quizRepository.save(any(Exam.class))).thenReturn(mockExam);
+    Section mockSection = new Section();
+    when(sectionRepository.save(any(Section.class))).thenReturn(mockSection);
 
     // Mock userAnswer save
-    when(userAnswerRepository.save(any(Questions.class))).thenReturn(new Questions());
+    when(quizAttemptRepository.save(any(Questions.class))).thenReturn(new Questions());
 
     // Execute the grading logic
     int totalScore = examService.gradeExam(submission);
@@ -95,8 +95,8 @@ class ExamServiceTest {
     // Verify the behavior and assert results
     //assertEquals(5, totalScore); // Total score should be 5 for correct answer
     verify(userRepository, times(1)).findById(1L);
-    verify(examRepository, times(1)).save(any(Exam.class));
-    verify(userAnswerRepository, times(1)).save(any(Questions.class));
+    verify(quizRepository, times(1)).save(any(Exam.class));
+    verify(quizAttemptRepository, times(1)).save(any(Questions.class));
   }
 
   @Test
@@ -121,7 +121,7 @@ class ExamServiceTest {
     submission.setSectionAnswers(Map.of("Section1", sectionAnswers));
 
     // Mocking questions and answers
-    JavaQuizQuestion question = JavaQuizQuestion.builder()
+    Question question = Question.builder()
             .id(1L)
             .correctAnswer("Answer1")
             .points(5)
@@ -130,12 +130,12 @@ class ExamServiceTest {
 
     // Mock exam and section save operations
     Exam mockExam = new Exam();
-    when(examRepository.save(any(Exam.class))).thenReturn(mockExam);
-    ExamSection mockSection = new ExamSection();
-    when(examSectionRepository.save(any(ExamSection.class))).thenReturn(mockSection);
+    when(quizRepository.save(any(Exam.class))).thenReturn(mockExam);
+    Section mockSection = new Section();
+    when(sectionRepository.save(any(Section.class))).thenReturn(mockSection);
 
     // Mock userAnswer save
-    when(userAnswerRepository.save(any(Questions.class))).thenReturn(new Questions());
+    when(quizAttemptRepository.save(any(Questions.class))).thenReturn(new Questions());
 
     // Execute the grading logic
     int totalScore = examService.gradeExam(submission);
@@ -143,14 +143,14 @@ class ExamServiceTest {
     // Verify the behavior and assert results
     assertEquals(0, totalScore); // Total score should be 0 for incorrect answer
     verify(userRepository, times(1)).findById(1L);
-    verify(examRepository, times(1)).save(any(Exam.class));
-    verify(userAnswerRepository, times(1)).save(any(Questions.class));
+    verify(quizRepository, times(1)).save(any(Exam.class));
+    verify(quizAttemptRepository, times(1)).save(any(Questions.class));
   }
 
   @Test
   void testGetExamWithSufficientQuestions() {
     // Mocking the question repository
-    List<JavaQuizQuestion> questions = Arrays.asList(new JavaQuizQuestion(), new JavaQuizQuestion(), new JavaQuizQuestion());
+    List<Question> questions = Arrays.asList(new Question(), new Question(), new Question());
     when(questionRepository.findByDifficultyLevelLessThanEqual(1)).thenReturn(questions);
 
     // Mock user repository
@@ -159,8 +159,8 @@ class ExamServiceTest {
     when(userRepository.findById(1L)).thenReturn(Optional.of(mockUser));
 
     // Mock exam section repository
-    List<ExamSection> mockSections = Arrays.asList(new ExamSection(), new ExamSection(), new ExamSection());
-    when(examSectionRepository.saveAll(anyList())).thenReturn(mockSections);
+    List<Section> mockSections = Arrays.asList(new Section(), new Section(), new Section());
+    when(sectionRepository.saveAll(anyList())).thenReturn(mockSections);
 
     // Test method
 //        Exam exam = examService.getExam(1, 1);
@@ -177,12 +177,12 @@ class ExamServiceTest {
   void testGetSubmittedExamBySessionId() {
     // Mock the repository behavior
     Exam mockExam = new Exam();
-    when(examRepository.findBySessionId("session123")).thenReturn(mockExam);
+    when(quizRepository.findBySessionId("session123")).thenReturn(mockExam);
 
     // Test method
     Exam result = examService.getSubmittedExamBySessionId("session123");
 
     assertNotNull(result);
-    verify(examRepository, times(1)).findBySessionId("session123");
+    verify(quizRepository, times(1)).findBySessionId("session123");
   }
 }

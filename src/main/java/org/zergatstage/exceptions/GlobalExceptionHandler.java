@@ -1,6 +1,7 @@
 package org.zergatstage.exceptions;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
@@ -8,8 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.zergatstage.DTO.ResponseDTO;
+import org.zergatstage.model.dto.ResponseDTO;
 
 import java.io.IOException;
 
@@ -41,6 +41,10 @@ public class GlobalExceptionHandler {
             return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
         }
         return "error";
+    }
+    @ExceptionHandler({ InvalidFormatException.class, IllegalArgumentException.class })
+    public ResponseEntity<String> handleBadImport(Exception ex) {
+        return ResponseEntity.badRequest().body(ex.getMessage());
     }
 
     @ExceptionHandler(IllegalArgumentException.class)

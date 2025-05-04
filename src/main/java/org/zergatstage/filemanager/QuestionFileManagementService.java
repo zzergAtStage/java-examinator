@@ -10,8 +10,8 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.zergatstage.model.JavaQuizQuestion;
-import org.zergatstage.repository.JavaQuizRepository;
+import org.zergatstage.model.Question;
+import org.zergatstage.repository.QuestionRepository;
 import org.zergatstage.services.validation.QuestionValidator;
 
 import java.io.*;
@@ -46,7 +46,7 @@ public class QuestionFileManagementService {
   @Value("${application.questions.backup.enabled:true}")
   private Boolean backupEnabled;
 
-  private final JavaQuizRepository javaQuizRepository;
+  private final QuestionRepository questionRepository;
   private final QuizImportService quizImportService;
   private final ObjectMapper objectMapper;
   private final QuestionValidator questionValidator;
@@ -77,16 +77,16 @@ public class QuestionFileManagementService {
         throw new FileNotFoundException("Questions file not found: " + initialQuestionsFile);
       }
 
-      List<JavaQuizQuestion> questions = objectMapper.readValue(
+      List<Question> questions = objectMapper.readValue(
               inputStream,
-              new TypeReference<List<JavaQuizQuestion>>() {}
+              new TypeReference<List<Question>>() {}
       );
 
       AtomicInteger successCount = new AtomicInteger(0);
       questions.forEach(question -> {
         try {
           questionValidator.validate(question);
-          javaQuizRepository.save(question);
+          questionRepository.save(question);
           successCount.incrementAndGet();
         } catch (Exception e) {
           log.error("Failed to import question: {}", question, e);
@@ -120,7 +120,7 @@ public class QuestionFileManagementService {
    * @throws IOException if there's an error writing the backup
    */
   public Path createBackup() throws IOException {
-    List<JavaQuizQuestion> questions = javaQuizRepository.findAllWithChoices();
+    List<Question> questions = questionRepository.findAllWithChoices();
     if (questions.isEmpty()) {
       log.warn("No questions found to backup");
       return null;

@@ -1,4 +1,4 @@
-package org.zergatstage.DTO;
+package org.zergatstage.model.dto;
 
 import lombok.*;
 

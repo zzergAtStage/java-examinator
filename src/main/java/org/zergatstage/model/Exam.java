@@ -2,22 +2,17 @@ package org.zergatstage.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.zergatstage.DTO.UserAnswerDTO;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
+ * publishedAt = null means draft.
+ * <p>Version is fixed after publish; older QuizAttempt rows therefore always match the right blueprint.</p>
  * @author father
  */
 @Entity
-@Setter
-@Getter
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
+@Data
 public class Exam {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,6 +25,6 @@ public class Exam {
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true) // One exam has many sections
     @JoinColumn(name = "exam_id") // Adds exam_id to ExamSection table
-    private List<ExamSection> sections; // Sections of the exam (grouped by topic/difficulty)
+    private List<Section> sections; // Sections of the exam (grouped by topic/difficulty)
 
 }

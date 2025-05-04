@@ -6,8 +6,8 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
-import org.zergatstage.model.AnswerType;
-import org.zergatstage.model.JavaQuizQuestion;
+import org.zergatstage.model.AnswerFormat;
+import org.zergatstage.model.Question;
 import org.zergatstage.model.QuestionType;
 import org.zergatstage.model.Questions;
 
@@ -24,8 +24,8 @@ class AnswerCheckerServiceTest {
   private QuizAnswerService quizAnswerService;
 
 
-  private JavaQuizQuestion singleAnswerQuestion;
-  private JavaQuizQuestion multipleAnswerQuestion;
+  private Question singleAnswerQuestion;
+  private Question multipleAnswerQuestion;
 
   @Mock
   private Questions userSingleAnswer;
@@ -35,24 +35,24 @@ class AnswerCheckerServiceTest {
   @BeforeEach
   void setup() {
     // Set up a single-answer question and corresponding user answer
-    singleAnswerQuestion = JavaQuizQuestion.builder()
+    singleAnswerQuestion = Question.builder()
             .id(1L)
             .points(5)
             .questionType(QuestionType.SIMPLE)
             .choices(List.of("Answer A", "Answer C", "Answer B", "Answer D"))
             .correctAnswer("Answer A")
             .questionHeader("Simple SINGLE-answer question")
-            .typeOfAnswer(AnswerType.SINGLE)
+            .typeOfAnswer(AnswerFormat.SINGLE)
             .difficultyLevel(1)
             .build();
-    multipleAnswerQuestion = JavaQuizQuestion.builder()
+    multipleAnswerQuestion = Question.builder()
             .id(1L)
             .points(5)
             .questionType(QuestionType.SIMPLE)
             .choices(List.of("Answer A", "Answer C", "Answer B", "Answer D"))
             .correctAnswers(List.of("Answer A", "Answer B"))
             .questionHeader("Simple MULTI-answer question")
-            .typeOfAnswer(AnswerType.MULTIPLE)
+            .typeOfAnswer(AnswerFormat.MULTIPLE)
             .difficultyLevel(1)
             .build();
 

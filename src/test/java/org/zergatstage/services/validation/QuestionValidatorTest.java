@@ -6,8 +6,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.zergatstage.exceptions.QuestionValidationException;
-import org.zergatstage.model.AnswerType;
-import org.zergatstage.model.JavaQuizQuestion;
+import org.zergatstage.model.AnswerFormat;
+import org.zergatstage.model.Question;
 import org.zergatstage.model.QuestionType;
 import org.zergatstage.services.ExamService;
 
@@ -37,7 +37,7 @@ class QuestionValidatorTest {
     @Test
     void validate_ValidQuestion_ShouldPassValidation() {
         // Arrange
-        JavaQuizQuestion question = JavaQuizQuestion.builder()
+        Question question = Question.builder()
                 .questionHeader("What is Java?")
                 .questionType(SIMPLE)
                 .choices(Arrays.asList("A programming language", "A coffee brand"))
@@ -45,7 +45,7 @@ class QuestionValidatorTest {
                 .points(10)
                 .build();
 
-        doNothing().when(examService).ensureQuestionIsUnique(any(JavaQuizQuestion.class));
+        doNothing().when(examService).ensureQuestionIsUnique(any(Question.class));
 
         // Act & Assert
         assertDoesNotThrow(() -> questionValidator.validate(question));
@@ -55,7 +55,7 @@ class QuestionValidatorTest {
     @Test
     void validate_MissingHeader_ShouldThrowException() {
         // Arrange
-        JavaQuizQuestion question = JavaQuizQuestion.builder()
+        Question question = Question.builder()
                 .questionType(SIMPLE)
                 .choices(Arrays.asList("Choice 1", "Choice 2"))
                 .correctAnswers(Collections.singletonList("Choice 1"))
@@ -73,7 +73,7 @@ class QuestionValidatorTest {
     @Test
     void validate_MissingChoices_ShouldThrowException() {
         // Arrange
-        JavaQuizQuestion question = JavaQuizQuestion.builder()
+        Question question = Question.builder()
                 .questionHeader("Test Question")
                 .questionType(SIMPLE)
                 .correctAnswers(Collections.singletonList("Choice 1"))
@@ -91,7 +91,7 @@ class QuestionValidatorTest {
     @Test
     void validate_CodeQuestionWithoutText_ShouldThrowException() {
         // Arrange
-        JavaQuizQuestion question = JavaQuizQuestion.builder()
+        Question question = Question.builder()
                 .questionHeader("Code Question")
                 .questionType(QuestionType.CODE)
                 .choices(Arrays.asList("Choice 1", "Choice 2"))
@@ -110,7 +110,7 @@ class QuestionValidatorTest {
     @Test
     void validate_CorrectAnswerNotInChoices_ShouldThrowException() {
         // Arrange
-        JavaQuizQuestion question = JavaQuizQuestion.builder()
+        Question question = Question.builder()
                 .questionHeader("Test Question")
                 .questionType(SIMPLE)
                 .choices(Arrays.asList("Choice 1", "Choice 2"))
@@ -131,7 +131,7 @@ class QuestionValidatorTest {
     @Test
     void validate_ZeroPoints_ShouldThrowException() {
         // Arrange
-        JavaQuizQuestion question = JavaQuizQuestion.builder()
+        Question question = Question.builder()
                 .questionHeader("Test Question")
                 .questionType(SIMPLE)
                 .choices(Arrays.asList("Choice 1", "Choice 2"))
@@ -150,7 +150,7 @@ class QuestionValidatorTest {
     @Test
     void validate_MultipleCorrectAnswers_ShouldSetMultipleAnswerType() {
         // Arrange
-        JavaQuizQuestion question = JavaQuizQuestion.builder()
+        Question question = Question.builder()
                 .questionHeader("Test Question")
                 .questionType(SIMPLE)
                 .choices(Arrays.asList("Choice 1", "Choice 2", "Choice 3"))
@@ -158,19 +158,19 @@ class QuestionValidatorTest {
                 .points(10)
                 .build();
 
-        doNothing().when(examService).ensureQuestionIsUnique(any(JavaQuizQuestion.class));
+        doNothing().when(examService).ensureQuestionIsUnique(any(Question.class));
 
         // Act
         questionValidator.validate(question);
 
         // Assert
-        assertEquals(AnswerType.MULTIPLE, question.getTypeOfAnswer());
+        assertEquals(AnswerFormat.MULTIPLE, question.getTypeOfAnswer());
     }
 
     @Test
     void validate_SingleCorrectAnswer_ShouldSetSingleAnswerType() {
         // Arrange
-        JavaQuizQuestion question = JavaQuizQuestion.builder()
+        Question question = Question.builder()
                 .questionHeader("Test Question")
                 .questionType(SIMPLE)
                 .choices(Arrays.asList("Choice 1", "Choice 2"))
@@ -178,19 +178,19 @@ class QuestionValidatorTest {
                 .points(10)
                 .build();
 
-        doNothing().when(examService).ensureQuestionIsUnique(any(JavaQuizQuestion.class));
+        doNothing().when(examService).ensureQuestionIsUnique(any(Question.class));
 
         // Act
         questionValidator.validate(question);
 
         // Assert
-        assertEquals(AnswerType.SINGLE, question.getTypeOfAnswer());
+        assertEquals(AnswerFormat.SINGLE, question.getTypeOfAnswer());
     }
 
     @Test
     void validate_MultipleValidationErrors_ShouldCollectAllErrors() {
         // Arrange
-        JavaQuizQuestion question = JavaQuizQuestion.builder()
+        Question question = Question.builder()
                 .questionType(QuestionType.CODE) // Missing questionText for CODE type
                 .points(0) // Invalid points
                 .build(); // Missing choices and correctAnswers

@@ -20,7 +20,7 @@ public class Questions {
     private Long id;
 
     @ManyToOne
-    private JavaQuizQuestion question;
+    private Question question;
     @ElementCollection(fetch = FetchType.EAGER)
     @Singular
     private List<String> userAnswers; // The answer submitted by the user

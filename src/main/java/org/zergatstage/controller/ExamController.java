@@ -3,10 +3,10 @@ package org.zergatstage.controller;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.zergatstage.DTO.ExamSubmissionDTO;
-import org.zergatstage.DTO.ResponseDTO;
+import org.zergatstage.model.dto.ExamSubmissionDTO;
+import org.zergatstage.model.dto.ResponseDTO;
 import org.zergatstage.model.Exam;
-import org.zergatstage.model.JavaQuizQuestion;
+import org.zergatstage.model.Question;
 import org.zergatstage.model.User;
 import org.zergatstage.services.ExamService;
 import org.zergatstage.services.UserService;
@@ -54,9 +54,9 @@ public class ExamController {
     }
 
     @PostMapping("/question")
-    public ResponseEntity<ResponseDTO> addQuestion(@RequestBody JavaQuizQuestion javaQuizQuestion) {
+    public ResponseEntity<ResponseDTO> addQuestion(@RequestBody Question question) {
 
-        examService.saveUniqueQuestion(javaQuizQuestion);
+        examService.saveUniqueQuestion(question);
         ResponseDTO responseDTO = ResponseDTO.builder()
                 .businessMessage("Success")
                 .build();
@@ -64,13 +64,13 @@ public class ExamController {
     }
 
     @GetMapping("/question/{id}")
-    public ResponseEntity<JavaQuizQuestion> getOneQuestionById(@PathVariable("id") Long id) {
-        JavaQuizQuestion javaQuizQuestion = examService.getQuestionById(id);
-        return new ResponseEntity<>(javaQuizQuestion, HttpStatus.OK);
+    public ResponseEntity<Question> getOneQuestionById(@PathVariable("id") Long id) {
+        Question question = examService.getQuestionById(id);
+        return new ResponseEntity<>(question, HttpStatus.OK);
     }
 
     @PutMapping("/question/{id}")
-    public ResponseEntity<ResponseDTO> updateQuestion(@PathVariable("id") Long id, @RequestBody JavaQuizQuestion question) {
+    public ResponseEntity<ResponseDTO> updateQuestion(@PathVariable("id") Long id, @RequestBody Question question) {
         examService.updateQuestion(id, question);
         return new ResponseEntity<>(ResponseDTO.builder().businessMessage("Updated").build(), HttpStatus.OK);
     }

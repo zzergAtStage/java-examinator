@@ -2,7 +2,7 @@ package org.zergatstage.services.answer;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.zergatstage.model.JavaQuizQuestion;
+import org.zergatstage.model.Question;
 import org.zergatstage.model.Questions;
 
 /** Calls a correct checker and call checks
@@ -24,7 +24,7 @@ public class QuizAnswerService {
    * @param questions The UserAnswer entity containing user's answers.
    * @return true if user's answers are correct, false otherwise.
    */
-  public boolean isAnswerCorrect(JavaQuizQuestion question, Questions questions) {
+  public boolean isAnswerCorrect(Question question, Questions questions) {
     AnswerChecker checker = checkerFactory.getAnswerCheckerByAnswersType(question.getTypeOfAnswer());
     return checker.isCorrect(question.getCorrectAnswers(), questions.getUserAnswers());
   }

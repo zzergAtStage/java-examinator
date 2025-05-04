@@ -1,10 +1,10 @@
-package org.zergatstage.DTO;
+package org.zergatstage.model.dto;
 
 import jakarta.persistence.Enumerated;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Singular;
-import org.zergatstage.model.AnswerType;
+import org.zergatstage.model.AnswerFormat;
 
 import java.util.List;
 
@@ -16,7 +16,7 @@ import java.util.List;
 public class UserAnswerDTO {
     private Long questionId;
     @Enumerated
-    private AnswerType answerType;
+    private AnswerFormat answerFormat;
     @Singular
-    private List<String> answers;
+    private List<ChoiceDTO> answers;
 }

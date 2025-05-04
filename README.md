@@ -11,6 +11,13 @@ The application is designed for use both as a standalone Spring Boot MVC applica
 The main source of questions is questions.json:
 ![Json structure](docs/images/exam-Exam_JSON_Structure.png)
 
+ver. 0.0.2-snapshot:
+```declarative
+User ──< QuizAttempt >── Quiz ──< Section ──< Question ──< Option
+│                          │
+└──────────< QuestionResponse
+```
+
 ## Getting Started
 
 To get started with the `java-examinator` module, follow these steps:

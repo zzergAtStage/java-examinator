@@ -3,7 +3,6 @@ package org.zergatstage.model;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.zergatstage.services.ExamService;
@@ -14,7 +13,7 @@ import org.zergatstage.services.ExamService;
 @SpringBootTest
 @Disabled
 public class QuestionsTest {
-  private JavaQuizQuestion question;
+  private Question question;
 
   @MockBean
   private final ExamService examService;
@@ -25,10 +24,10 @@ public class QuestionsTest {
 
   @BeforeEach
   void init(){
-    JavaQuizQuestion question = JavaQuizQuestion.builder()
+    Question question = Question.builder()
             .questionType(QuestionType.SIMPLE)
             .questionHeader("Can you inherit the java.lang.String class?")
-            .typeOfAnswer(AnswerType.SINGLE)
+            .typeOfAnswer(AnswerFormat.SINGLE)
             .correctAnswer("No")
             .build();
 

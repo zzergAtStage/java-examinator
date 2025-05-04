@@ -7,10 +7,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.zergatstage.model.Exam;
-import org.zergatstage.model.JavaQuizQuestion;
+import org.zergatstage.model.Question;
 import org.zergatstage.model.Submissions;
 import org.zergatstage.model.User;
-import org.zergatstage.repository.JavaQuizRepository;
+import org.zergatstage.repository.QuestionRepository;
 import org.zergatstage.services.ExamService;
 import org.zergatstage.services.UserService;
 import org.zergatstage.services.validation.QuestionValidator;
@@ -29,14 +29,14 @@ public class SimpleWebController {
   private final ExamService examService;
   private final UserService userService;
   private final HttpSession session;
-  private final JavaQuizRepository javaQuizRepository;
+  private final QuestionRepository questionRepository;
   private final QuestionValidator questionValidator;
 
-  public SimpleWebController(ExamService examService, UserService userService, HttpSession session, JavaQuizRepository repository, QuestionValidator questionValidator) {
+  public SimpleWebController(ExamService examService, UserService userService, HttpSession session, QuestionRepository repository, QuestionValidator questionValidator) {
     this.examService = examService;
     this.userService = userService;
     this.session = session;
-    this.javaQuizRepository = repository;
+    this.questionRepository = repository;
       this.questionValidator = questionValidator;
   }
 
@@ -140,14 +140,14 @@ public class SimpleWebController {
 
   //some helping endpoint to use prism js library and check hypotheses
   @GetMapping("/add_question")
-  public String addQuestion(@RequestBody JavaQuizQuestion question, Model model) {
+  public String addQuestion(@RequestBody Question question, Model model) {
     //TODO: rework with service to bring the checks
-    if (!javaQuizRepository.findByQuestionHeader(question.getQuestionHeader()).isEmpty()) {
+    if (!questionRepository.findByQuestionHeader(question.getQuestionHeader()).isEmpty()) {
       throw new IllegalArgumentException("Question with header: " + question.getQuestionHeader() +
               " already exists");
     }
     questionValidator.validate(question);
-    javaQuizRepository.save(question);
+    questionRepository.save(question);
     return "questions";
   }
 }
