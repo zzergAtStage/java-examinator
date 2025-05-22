@@ -2,6 +2,7 @@ package org.zergatstage.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.zergatstage.DTO.ExamSubmissionDTO;
 import org.zergatstage.DTO.ResponseDTO;
@@ -20,6 +21,7 @@ public class ExamController {
 
     private final ExamService examService;
     private final UserService userService;
+    private String currentValue = "INITIAL";
 
     public ExamController(ExamService examService, UserService userService) {
         this.examService = examService;

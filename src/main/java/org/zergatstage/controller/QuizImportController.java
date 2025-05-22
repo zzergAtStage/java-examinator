@@ -3,6 +3,7 @@ package org.zergatstage.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.zergatstage.filemanager.QuizImportService;
@@ -36,5 +37,10 @@ public class QuizImportController {
     public ResponseEntity<?> dropImportedQuestions(){
         quizImportService.dropImport();
         return ResponseEntity.status(HttpStatus.OK).body("That's fine, that's ok...");
+    }
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<?> deleteQuestionById(@PathVariable("id") Long id){
+        quizImportService.deleteQuestionById(id);
+        return ResponseEntity.ok(String.format("Question with id = %s deleted",id));
     }
 }

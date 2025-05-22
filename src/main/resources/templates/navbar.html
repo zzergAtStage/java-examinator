@@ -13,9 +13,13 @@
   <div class="container-fluid">
     <a class="navbar-brand" href="/">Quiz App</a>
     <li>
-      <button type="button" th:classappend="${username} ? 'btn btn-warning' : 'btn btn-secondary disabled'" th:href="@{/quiz}" th:onclick="window.location.href='/quiz'" >
+      <button type="button"
+              th:classappend="${username} ? 'btn btn-warning' : 'btn btn-secondary disabled'"
+              data-bs-toggle="modal"
+              data-bs-target="#startQuizModal"
+              th:disabled="${username} ? false : true">
         Start Quiz
-    </button>
+      </button>
     </li>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
@@ -34,10 +38,90 @@
       </ul>
     </div>
   </div>
+  <!-- START QUIZ PARAMETER MODAL -->
+  <div class="modal fade" id="startQuizModal" tabindex="-1"
+       aria-labelledby="startQuizModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form th:action="@{/start-quiz}" method="get" class="needs-validation" novalidate id="startQuizForm">
+          <div class="modal-header">
+            <h5 class="modal-title" id="startQuizModalLabel">Configure Quiz</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <!-- Difficulty Selection -->
+            <div class="mb-3">
+              <label class="form-label">Difficulty</label>
+              <div>
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="difficulty"
+                         id="difficultyEasy" value="easy" checked>
+                  <label class="form-check-label" for="difficultyEasy">Easy</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="difficulty"
+                         id="difficultyMiddle" value="middle">
+                  <label class="form-check-label" for="difficultyMiddle">Middle</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="difficulty"
+                         id="difficultyHard" value="hard">
+                  <label class="form-check-label" for="difficultyHard">Hard</label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Number of Questions -->
+            <div class="mb-3">
+              <label for="questionCount" class="form-label">
+                Number of Questions
+              </label>
+              <input type="number"
+                     class="form-control"
+                     id="questionCount"
+                     name="count"
+                     min="3" max="20"
+                     value="10"
+                     required>
+              <div class="invalid-feedback">
+                Please enter a number between 3 and 20.
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary"
+                    data-bs-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Start Quiz</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <!-- /END QUIZ PARAMETER MODAL -->
 </nav>
 <!-- Navbar End -->
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  // IIFE to avoid polluting global namespace
+  (function () {
+    'use strict'
+
+    // Fetch the form we want to apply validation to
+    const form = document.getElementById('startQuizForm')
+
+    form.addEventListener('submit', function (event) {
+      // Use HTML5 constraint validation:
+      if (!form.checkValidity()) {
+        event.preventDefault()
+        event.stopPropagation()
+      }
+      form.classList.add('was-validated')
+    }, false)
+  })();
+</script>
 </body>
 </html>

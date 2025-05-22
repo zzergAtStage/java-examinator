@@ -12,6 +12,7 @@ class QuizManager {
     this.container = document.getElementById(containerId);
     this.currentSection = 0;
     this.currentQuestion = 0;
+    this.totalQuestions = 0;
 
     this._loadData();
     this._wireEvents();
@@ -23,6 +24,8 @@ class QuizManager {
    */
   _loadData() {
     this.examData = JSON.parse(this.dataScript.textContent);
+    this.totalQuestions = this.examData.sections.reduce((sum, section) => sum + section.questions.length, 0);
+    document.getElementById('totalQuestions').innerText = this.totalQuestions;
   }
 
   /**
@@ -57,6 +60,7 @@ class QuizManager {
 
     Prism.highlightAll();
     this._updateNav();
+    this._updateProgress();
   }
 
   /**
@@ -99,6 +103,22 @@ class QuizManager {
     document.getElementById('submitButton').classList.toggle('d-none', !(lastSection && lastQuestion));
   }
 
+  /**
+   * Updates progress bar text and percentage.
+   */
+  _updateProgress() {
+    const questionIndex = this.examData.sections
+      .slice(0, this.currentSection)
+      .reduce((sum, section) => sum + section.questions.length, 0) + this.currentQuestion + 1;
+
+    document.getElementById('currentQuestionNum').innerText = questionIndex;
+    const progressPercent = (questionIndex / this.totalQuestions) * 100;
+    const progressBar = document.getElementById('quizProgressBar');
+    progressBar.style.width = `${progressPercent}%`;
+    progressBar.setAttribute('aria-valuenow', progressPercent);
+  }
+
+  /**
   /**
    * Serializes answers and POSTs the full JSON to the server.
    */

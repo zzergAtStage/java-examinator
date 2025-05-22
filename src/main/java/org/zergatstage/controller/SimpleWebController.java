@@ -88,13 +88,24 @@ public class SimpleWebController {
     return "submissions.html";
   }
 
-  @GetMapping("/quiz")
-  public String quiz(Model m, RedirectAttributes ra) {
+  @GetMapping("/start-quiz")
+  public String startQuiz(
+      @RequestParam(name="difficulty", defaultValue="easy") String difficulty,
+      @RequestParam(name="count", defaultValue="10") int count,
+      Model m,
+      RedirectAttributes ra) {
     String username = (String) session.getAttribute("username");
     String x = checkUser(username, ra);
+    int difficultyInt = 1;
     if (x != null) return x; //redirect
     User user = userService.getUserByUsername(username);
-    Exam qForm = examService.getExam(user, 3, 20);// TODO: replace fetch from model
+    // TODO: incorporate 'difficulty' parameter
+    switch (difficulty) {
+      case "easy" -> difficultyInt = 1;
+      case "middle" -> difficultyInt = 2;
+      case "hard" -> difficultyInt =3;
+    }
+    Exam qForm = examService.getExam(user, difficultyInt, count);
     m.addAttribute("qForm", qForm);
     return "quiz";
   }
