@@ -3,6 +3,7 @@ package org.zergatstage.exceptions;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
@@ -14,6 +15,7 @@ import org.zergatstage.DTO.ResponseDTO;
 import java.io.IOException;
 
 @ControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler {
 
     // Helper method to determine if the request expects JSON
@@ -27,6 +29,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(JsonProcessingException.class)
     public Object handleJsonProcessingException(JsonProcessingException ex, HttpServletRequest request) {
+        log.error(ex.getMessage());
         if (isJsonRequest(request)) {
             ErrorResponse errorResponse = new ErrorResponse("JSON processing error: " + ex.getMessage());
             return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
@@ -47,20 +50,20 @@ public class GlobalExceptionHandler {
     public Object handleIllegalArgument(IllegalArgumentException ex,
                                         HttpServletRequest request,
                                         Model model) {
+        log.error(ex.getMessage());
         if (isJsonRequest(request)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(ResponseDTO.builder()
-                            .errorMessage(ex.getMessage())
-                            .businessMessage(ex.getMessage())
-                            .build());
+                    .body(new ResponseDTO(
+                            ex.getMessage(), null));
         }
         // For web requests, add message to model
-        model.addAttribute("businessMessage", ex.getMessage());
+        model.addAttribute("businessMessage: ", ex.getMessage());
         return "error";
     }
 
     @ExceptionHandler(IOException.class)
     public Object handleIOException(IOException ex, HttpServletRequest request) {
+        log.error(ex.getMessage());
         if (isJsonRequest(request)) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("File processing error: " + ex.getMessage());
@@ -68,13 +71,24 @@ public class GlobalExceptionHandler {
         return "error";
     }
 
-    // Catch-all handler for unhandled exceptions
+    /**
+     * Handles all uncaught exceptions not explicitly handled by other methods.
+     *
+     * @param ex      The exception.
+     * @param request The incoming HTTP request.
+     * @param model   The UI model used for web requests.
+     * @return A JSON or HTML error response depending on the request type.
+     */
     @ExceptionHandler(Exception.class)
-    public Object handleAllOtherExceptions(Exception ex, HttpServletRequest request) {
+    public Object handleAllOtherExceptions(Exception ex, HttpServletRequest request, Model model) {
+        String message = "Internal server error: " + ex.getMessage();
+        log.error(ex.getMessage());
         if (isJsonRequest(request)) {
-            ErrorResponse errorResponse = new ErrorResponse("Internal server error: " + ex.getMessage());
+
+            ErrorResponse errorResponse = new ErrorResponse(message);
             return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
         }
+        model.addAttribute("errorMessage", message);  // For Thymeleaf or JSP to show the actual error
         return "error";
     }
 }

@@ -2,7 +2,6 @@ package org.zergatstage.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.zergatstage.DTO.ExamSubmissionDTO;
 import org.zergatstage.DTO.ResponseDTO;
@@ -41,8 +40,8 @@ public class ExamController {
 
     @PostMapping("/submit")
     public ResponseEntity<Integer> submitExam(@RequestBody ExamSubmissionDTO submission) {
-        int totalScore = examService.gradeExam(submission);
-        return ResponseEntity.ok(totalScore); // Return the total score of the exam
+        examService.gradeAndSaveExam(submission);
+        return new ResponseEntity<>(HttpStatus.OK); // Return the total score of the exam
     }
 
     @PostMapping("/user")
@@ -60,7 +59,7 @@ public class ExamController {
 
         examService.saveUniqueQuestion(javaQuizQuestion);
         ResponseDTO responseDTO = ResponseDTO.builder()
-                .businessMessage("Success")
+                .businessMessage("Success: id=" + javaQuizQuestion.getId())
                 .build();
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }

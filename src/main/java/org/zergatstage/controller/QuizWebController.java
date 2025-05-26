@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.zergatstage.model.Exam;
 import org.zergatstage.model.JavaQuizQuestion;
+import org.zergatstage.model.SubmissionResult;
 import org.zergatstage.model.Submissions;
 import org.zergatstage.model.User;
 import org.zergatstage.repository.JavaQuizRepository;
@@ -23,7 +24,7 @@ import java.util.List;
  */
 
 @Controller
-public class SimpleWebController {
+public class QuizWebController {
 
 
   private final ExamService examService;
@@ -32,7 +33,7 @@ public class SimpleWebController {
   private final JavaQuizRepository javaQuizRepository;
   private final QuestionValidator questionValidator;
 
-  public SimpleWebController(ExamService examService, UserService userService, HttpSession session, JavaQuizRepository repository, QuestionValidator questionValidator) {
+  public QuizWebController(ExamService examService, UserService userService, HttpSession session, JavaQuizRepository repository, QuestionValidator questionValidator) {
     this.examService = examService;
     this.userService = userService;
     this.session = session;
@@ -110,16 +111,22 @@ public class SimpleWebController {
     return "quiz";
   }
 
-  @PostMapping("/submitQuiz")
-  public ResponseEntity<String> submit(@RequestBody Exam exam, Model m) {
-    //TODO: recalculate of results
-    //save the exam result
-    examService.gradeExam(exam);
-
-    return ResponseEntity.ok("Submitted");
+  @PostMapping("/start-already-taken")
+  public String startAlreadyTakenExam(@RequestParam("uuid") String uuid, Model m, RedirectAttributes ra){
+    String username = (String) session.getAttribute("username");
+    String x = checkUser(username, ra);
+    if (x != null) return x; //redirect
+    User user = userService.getUserByUsername(username);
+    Exam qForm = examService.prepareExamLikeTaken(uuid, user.getId());
+    m.addAttribute("qForm", qForm);
+    return "quiz";
   }
 
-
+  @PostMapping("/submitQuiz")
+  public ResponseEntity<?> submit(@RequestBody Exam exam) {
+    SubmissionResult result = examService.gradeAndSaveExam(exam);
+    return ResponseEntity.ok(result);
+  }
 
     @GetMapping("/submission")
     public String getSubmission(@RequestParam("id") String submissionId, Model model){
@@ -130,10 +137,7 @@ public class SimpleWebController {
 
   @GetMapping("/result")
   public String redirectLazyToResult(Model model) {
-    model.addAttribute("username", session.getAttribute("username"));
-    model.addAttribute("totalScore", 97); //Just for fun. Why not?
-    model.addAttribute("totalCorrect", 100);
-    return "result.html";
+    return "result";
   }
 
   @RequestMapping(value = "/delete", method = RequestMethod.POST)

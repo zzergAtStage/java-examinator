@@ -28,8 +28,8 @@ public class Exam {
     @ManyToOne
     private User user; // The user taking the exam
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true) // One exam has many sections
-    @JoinColumn(name = "exam_id") // Adds exam_id to ExamSection table
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "exam_id")
     private List<ExamSection> sections; // Sections of the exam (grouped by topic/difficulty)
 
 }

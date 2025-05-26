@@ -38,6 +38,7 @@ public class QuizImportController {
         quizImportService.dropImport();
         return ResponseEntity.status(HttpStatus.OK).body("That's fine, that's ok...");
     }
+
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteQuestionById(@PathVariable("id") Long id){
         quizImportService.deleteQuestionById(id);

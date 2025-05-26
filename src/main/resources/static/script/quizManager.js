@@ -123,14 +123,34 @@ class QuizManager {
    * Serializes answers and POSTs the full JSON to the server.
    */
   _submit(event) {
+    console.log('Submitting quiz…');
     event.preventDefault();
+
     fetch('/submitQuiz', {
       method: 'POST',
-      headers: {'Content-Type': 'application/json'},
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(this.examData)
     })
-    .then(res => res.ok ? window.location.href = '/result'
-                        : Promise.reject('Submission failed'));
+      .then(response => {
+        // 1) Check for HTTP-level errors
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status} – ${response.statusText}`);
+        }
+        // 2) Transform the response body into JSON
+        return response.json();
+      })
+      .then(data => {
+        // 3) Now `data` is your SubmissionResult object
+        console.log('Trace:', data);
+        sessionStorage.setItem('submissionResult', JSON.stringify(data));
+        // 4) Redirect to results page
+        window.location.href = '/result';
+      })
+      .catch(err => {
+        // 5) Handle both network and parsing errors
+        console.error('Quiz submission error:', err);
+        alert('Failed to submit quiz. Please try again later.');
+      });
   }
 }
 

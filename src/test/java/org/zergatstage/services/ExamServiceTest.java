@@ -52,7 +52,7 @@ class ExamServiceTest {
   }
 
   @Test
-  void testGradeExamSuccessfully() {
+  void testGradeAndSaveExamSuccessfully() {
     // Mocking exam submission
     ExamSubmissionDTO submission = new ExamSubmissionDTO();
     submission.setUserId(1L);
@@ -90,7 +90,7 @@ class ExamServiceTest {
     when(userAnswerRepository.save(any(Questions.class))).thenReturn(new Questions());
 
     // Execute the grading logic
-    int totalScore = examService.gradeExam(submission);
+    int totalScore = examService.gradeAndSaveExam(submission);
 
     // Verify the behavior and assert results
     //assertEquals(5, totalScore); // Total score should be 5 for correct answer
@@ -100,7 +100,7 @@ class ExamServiceTest {
   }
 
   @Test
-  void testGradeExamWithIncorrectAnswer() {
+  void testGradeAndSaveExamWithIncorrectAnswer() {
     // Mocking exam submission
     ExamSubmissionDTO submission = new ExamSubmissionDTO();
     submission.setUserId(1L);
@@ -138,7 +138,7 @@ class ExamServiceTest {
     when(userAnswerRepository.save(any(Questions.class))).thenReturn(new Questions());
 
     // Execute the grading logic
-    int totalScore = examService.gradeExam(submission);
+    int totalScore = examService.gradeAndSaveExam(submission);
 
     // Verify the behavior and assert results
     assertEquals(0, totalScore); // Total score should be 0 for incorrect answer
@@ -177,7 +177,7 @@ class ExamServiceTest {
   void testGetSubmittedExamBySessionId() {
     // Mock the repository behavior
     Exam mockExam = new Exam();
-    when(examRepository.findBySessionId("session123")).thenReturn(mockExam);
+    when(examRepository.findBySessionId("session123")).thenReturn(Optional.of(mockExam));
 
     // Test method
     Exam result = examService.getSubmittedExamBySessionId("session123");
