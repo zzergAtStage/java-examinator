@@ -1,0 +1,62 @@
+pipeline {
+    agent any
+    
+    tools {
+        // Define Maven tool installation
+        maven 'mvn' // Use the name of your Maven installation as configured in Jenkins
+    }
+    
+    environment {
+        APP_NAME = 'application/java-examinator'
+        APP_VERSION = '0.0.1-SNAPSHOT'
+        DOCKER_REGISTRY = 'http://192.168.1.113:5000/v2/_catalog' // Replace with your Docker registry
+        KUBERNETES_CONTEXT = 'minikube'
+        NAMESPACE = 'default'
+    }
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+        
+        stage('Build JAR') {
+            steps {
+                sh 'mvn clean package -DskipTests'
+            }
+        }
+        
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    def dockerImage = docker.build(
+                        "${env.DOCKER_REGISTRY}/${env.APP_NAME}:${env.BUILD_NUMBER}",
+                        "--build-arg JAR_FILE=./target/java-examinator-${env.APP_VERSION}.jar --build-arg JAR_PORT=8080 -f Dockerfile ."
+                    )
+                    
+                    dockerImage.push()
+                    dockerImage.push('latest')
+                }
+            }
+        }
+        
+        stage('Deploy to Minikube') {
+            steps {
+                withKubeConfig([credentialsId: 'minikube-credentials', contextName: env.KUBERNETES_CONTEXT]) {
+                    sh '''
+                        kubectl apply -f k8s/deployment.yaml -n ${NAMESPACE}
+                        kubectl apply -f k8s/service.yaml -n ${NAMESPACE}
+                        kubectl set image deployment/java-examinator-deployment java-examinator=${DOCKER_REGISTRY}/${APP_NAME}:${BUILD_NUMBER} -n ${NAMESPACE}
+                    '''
+                }
+            }
+        }
+    }
+    
+    post {
+        always {
+            cleanWs()
+        }
+    }
+}

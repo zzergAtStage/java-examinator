@@ -37,7 +37,7 @@ public class QuestionFileManagementService {
   private static final DateTimeFormatter TIMESTAMP_FORMATTER =
           DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
 
-  @Value("${application.questions.file}")
+  @Value("${application.questions.import.file}")
   private String initialQuestionsFile;
 
   @Value("${application.questions.import.enabled}")

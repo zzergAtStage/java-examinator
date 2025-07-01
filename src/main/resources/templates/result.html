@@ -24,17 +24,25 @@
 
     <div class="d-flex justify-content-center">
       <p>Participant name:&nbsp;&nbsp;</p>
-      <p th:text="${username}">user</p>
+      <p id="username">user</p>
+      <!-- <p th:text="${username}">user</p> -->
     </div>
 
     <div class="d-flex justify-content-center">
-      <p>Total correct answer:&nbsp;&nbsp;</p>
-      <p th:if="${totalScore}" th:text="${totalScore}"></p>
+      <p>Total score:&nbsp;&nbsp;</p>
+      <p id="totalScore">0</p>
+      <!-- <p th:if="${totalScore}" th:text="${totalScore}"></p> -->
+    </div>
+    <div class="d-flex justify-content-center">
+      <p>Total answered:&nbsp;&nbsp;</p>
+      <p id="totalAnswered">0</p>
+      <!-- <p th:if="${totalScore}" th:text="${totalAnswered}"></p> -->
     </div>
 
     <div class="d-flex justify-content-center">
       <p>Total false answer:&nbsp;&nbsp;</p>
-      <p th:if="${totalCorrect}" th:text="5 - ${totalCorrect}"></p>
+      <p id = "totalFalseAnswered">0</p>
+      <!-- <p th:if="${totalAnswered}" th:text="${totalAnswered}"></p> -->
     </div>
 
     <div class="d-flex justify-content-center mt-4">
@@ -47,9 +55,20 @@
 </div>
 
 <!-- Importing Footer -->
-<div th:insert="~{footer.html :: footer}"></div>
+<footer th:replace="~{footer.html :: footer}"></footer>
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+  const result = JSON.parse(sessionStorage.getItem('submissionResult'));
+  document.getElementById('totalScore').innerText = result.totalScore;
+  document.getElementById('totalAnswered').innerText = result.totalAnswered;
+  document.getElementById('totalFalseAnswered').innerText = result.totalFalseAnswered;
+  document.getElementById('username').innerText = result.participantName;
+});
+
+</script>
+
 </body>
 </html>

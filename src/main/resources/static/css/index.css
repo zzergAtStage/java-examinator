@@ -1,21 +1,15 @@
-* {
-	margin: 0;
-	padding: 0;
-	box-sizing: border-box;
-}
-
+html,
 body {
-	width: 100%;
-	overflow-x: hidden;
+	height: 100%;
 }
 
 .main-container {
-	min-height: calc(100vh - 136px);
+	/* min-height: calc(100vh - 136px); */
 	display: grid;
 	grid-template-columns: 1fr;
 	grid-template-rows: 1fr 1fr;
 	grid-template-areas: "image-box"
-						"text-box";
+		"text-box";
 	row-gap: 50px;
 	column-gap: 50px;
 }
@@ -68,8 +62,7 @@ body {
 	margin-top: -37px;
 }
 
-footer {
-	height: 80px;
-	text-align: center;
-	line-height: 80px;
+.my-4 {
+	margin-top: 1.5rem !important;
+	margin-bottom: 0 !important
 }

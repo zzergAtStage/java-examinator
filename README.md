@@ -64,8 +64,11 @@ http://localhost:8080
 6. Import your custom exam.json  
 Run command:   
 ```bash
-curl --location 'localhost:8080/api/quiz/import' \
---form 'quiz=@"/<your custom data path>/data/exam.json"'
+curl --location 'localhost:8080/api/quiz/import' --form 'quiz=@"/<your custom data full OS path>/data/exam.json"'
+```
+Drop import:
+```bash
+curl --location --request DELETE 'http://examinator.local:8080/api/quiz/delete' --data ''
 ```
 
 ## Screenshoots

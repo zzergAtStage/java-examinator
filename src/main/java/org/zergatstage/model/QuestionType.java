@@ -4,5 +4,6 @@ package org.zergatstage.model;
  */
 public enum QuestionType {
     CODE,
-    SIMPLE
+    SIMPLE,
+    FILL_THE_GAP
 }

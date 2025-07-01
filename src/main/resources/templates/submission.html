@@ -67,7 +67,7 @@
   </style>
 </head>
 
-<body>
+<body class="d-flex flex-column h-100">
 
   <!-- Importing NavBar -->
   <div th:replace="~{navbar.html :: navbar}"></div>
@@ -114,13 +114,20 @@
           let questionBlock = `
           <div class="ques-box">
             <p class="title">${question.questionHeader}</p>
+            <p class="id">Question ID: ${question.id}</p>
         `;
 
           // Display the code block if question type is 'CODE'
           if (question.questionType === 'CODE') {
             questionBlock += `
             <pre><code class="language-java">${question.questionText}</code></pre>
+            <hr style="height:2px;border-width:0;color:gray;background-color:gray">
           `;
+          } else {
+            questionBlock += `
+            <p>${question.questionText}</p>
+            <hr style="height:2px;border-width:0;color:gray;background-color:gray">
+            `;
           }
 
           // Iterate over choices and create radio buttons (disabled)

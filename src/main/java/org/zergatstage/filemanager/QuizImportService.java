@@ -15,7 +15,6 @@ import org.zergatstage.services.validation.QuestionValidator;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -116,4 +115,11 @@ public class QuizImportService {
         javaQuizRepository.saveAll(questions);
     }
 
+    public void dropImport() {
+        javaQuizRepository.deleteAll();
+    }
+
+    public void deleteQuestionById(Long id) {
+        javaQuizRepository.deleteById(id);
+    }
 }

@@ -34,6 +34,10 @@ public class WebConfig implements WebMvcConfigurer {
                 .addResourceLocations("classpath:/static/css/")
                 .setCacheControl(CacheControl.maxAge(Duration.ofDays(365)));
 
+        registry.addResourceHandler("/favicon.ico")
+                .addResourceLocations("classpath:/static/images/favicon.ico")
+                .setCacheControl(CacheControl.maxAge(Duration.ofDays(365)));
+
         registry.addResourceHandler("/images/**")
                 .addResourceLocations("classpath:/static/images/")
                 .setCacheControl(CacheControl.maxAge(Duration.ofDays(365)));

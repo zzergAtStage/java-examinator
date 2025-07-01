@@ -15,12 +15,12 @@ import org.zergatstage.services.UserService;
  * @author father
  */
 @RestController
-
 @RequestMapping(produces = "application/json", path = "/api/v1/exam")
 public class ExamController {
 
     private final ExamService examService;
     private final UserService userService;
+    private String currentValue = "INITIAL";
 
     public ExamController(ExamService examService, UserService userService) {
         this.examService = examService;
@@ -40,8 +40,8 @@ public class ExamController {
 
     @PostMapping("/submit")
     public ResponseEntity<Integer> submitExam(@RequestBody ExamSubmissionDTO submission) {
-        int totalScore = examService.gradeExam(submission);
-        return ResponseEntity.ok(totalScore); // Return the total score of the exam
+        examService.gradeAndSaveExam(submission);
+        return new ResponseEntity<>(HttpStatus.OK); // Return the total score of the exam
     }
 
     @PostMapping("/user")
@@ -59,7 +59,7 @@ public class ExamController {
 
         examService.saveUniqueQuestion(javaQuizQuestion);
         ResponseDTO responseDTO = ResponseDTO.builder()
-                .businessMessage("Success")
+                .businessMessage("Success: id=" + javaQuizQuestion.getId())
                 .build();
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
